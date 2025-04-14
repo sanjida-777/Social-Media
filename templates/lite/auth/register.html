@@ -1,0 +1,114 @@
+{% extends "lite/base.html" %}
+
+{% block title %}Sign Up - Deshi Anime{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-logo">
+        <h1 class="text-primary mb-0">Deshi Anime</h1>
+        <p class="text-muted">Create a new account</p>
+    </div>
+    
+    <div class="auth-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row mb-3">
+                <div class="col">
+                    <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First name" required>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last name" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email address" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" id="password" name="password" placeholder="New password" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label small text-muted">Date of birth</label>
+                <div class="row g-2">
+                    <div class="col-4">
+                        <select class="form-select" name="birth_day" required>
+                            <option value="" selected disabled>Day</option>
+                            {% for day in range(1, 32) %}
+                                <option value="{{ day }}">{{ day }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select class="form-select" name="birth_month" required>
+                            <option value="" selected disabled>Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select class="form-select" name="birth_year" required>
+                            <option value="" selected disabled>Year</option>
+                            {% for year in range(2023, 1900, -1) %}
+                                <option value="{{ year }}">{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label small text-muted">Gender</label>
+                <div class="d-flex gap-2">
+                    <div class="form-check flex-grow-1 border rounded p-2">
+                        <input class="form-check-input" type="radio" name="gender" id="female" value="female" required>
+                        <label class="form-check-label w-100" for="female">Female</label>
+                    </div>
+                    <div class="form-check flex-grow-1 border rounded p-2">
+                        <input class="form-check-input" type="radio" name="gender" id="male" value="male" required>
+                        <label class="form-check-label w-100" for="male">Male</label>
+                    </div>
+                    <div class="form-check flex-grow-1 border rounded p-2">
+                        <input class="form-check-input" type="radio" name="gender" id="custom" value="custom" required>
+                        <label class="form-check-label w-100" for="custom">Custom</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <p class="small text-muted">
+                    By clicking Sign Up, you agree to our <a href="#">Terms</a>, <a href="#">Privacy Policy</a> and <a href="#">Cookies Policy</a>.
+                </p>
+            </div>
+            
+            <button type="submit" class="btn-create-account">Sign Up</button>
+        </form>
+    </div>
+    
+    <div class="text-center mt-3">
+        <a href="{{ url_for('auth.login') }}" class="text-decoration-none">Already have an account?</a>
+    </div>
+</div>
+{% endblock %}

@@ -10,12 +10,12 @@ from flask import current_app
 def load_config():
     """
     Load the application configuration from config.json
-    
+
     Returns:
         dict: The configuration dictionary
     """
-    config_path = os.path.join(current_app.root_path, '..', 'config.json')
-    
+    config_path = os.path.join(current_app.root_path, 'config.json')
+
     try:
         with open(config_path, 'r') as config_file:
             config = json.load(config_file)
@@ -27,7 +27,7 @@ def load_config():
 def get_default_config():
     """
     Get a default configuration in case loading fails
-    
+
     Returns:
         dict: Default configuration dictionary
     """
@@ -57,21 +57,21 @@ def get_default_config():
 def get_config_value(config, path, default=None):
     """
     Get a configuration value by path
-    
+
     Args:
         config (dict): The configuration dictionary
         path (str): Dot notation path to the configuration value
         default: Default value if path doesn't exist
-        
+
     Returns:
         The configuration value or default value
     """
     keys = path.split('.')
     value = config
-    
+
     for key in keys:
         if not isinstance(value, dict) or key not in value:
             return default
         value = value[key]
-    
+
     return value

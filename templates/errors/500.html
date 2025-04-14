@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Server Error{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="error-title">
+            <h1>500</h1>
+            <h2>Server Error</h2>
+        </div>
+        <div class="error-message">
+            <p>Something went wrong on our end. Please try again later or contact support if the problem persists.</p>
+        </div>
+        <div class="error-actions">
+            <div class="error-button">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    <span>Go to Homepage</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

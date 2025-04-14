@@ -1,0 +1,123 @@
+{% extends "lite/base.html" %}
+
+{% block title %}New Message - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-white p-3 d-flex align-items-center">
+        <a href="{{ url_for('messages.inbox') }}" class="btn btn-light rounded-circle me-2">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h5 class="mb-0">New Message</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('messages.new_message') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="client_message_id" value="{{ uuid4() }}">
+            
+            <div class="mb-3">
+                <label for="recipient" class="form-label">To:</label>
+                <input type="text" class="form-control" id="recipient" name="recipient" placeholder="Search for a friend" value="{{ form.recipient.data if form.recipient.data }}" required>
+                <div id="recipientResults" class="list-group mt-1 d-none"></div>
+                {% if form.recipient.errors %}
+                    {% for error in form.recipient.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="content" class="form-label">Message:</label>
+                <textarea class="form-control" id="content" name="content" rows="5" placeholder="Type your message here..." required>{{ form.content.data if form.content.data }}</textarea>
+                {% if form.content.errors %}
+                    {% for error in form.content.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="attachment" class="form-label">Attachment (optional):</label>
+                <input type="file" class="form-control" id="attachment" name="attachment">
+                {% if form.attachment.errors %}
+                    {% for error in form.attachment.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-1"></i> Send Message
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const recipientInput = document.getElementById('recipient');
+        const recipientResults = document.getElementById('recipientResults');
+        let searchTimeout;
+        
+        recipientInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            
+            const query = this.value.trim();
+            if (query.length < 2) {
+                recipientResults.classList.add('d-none');
+                recipientResults.innerHTML = '';
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`/messages/api/users/search?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        recipientResults.innerHTML = '';
+                        
+                        if (data.length === 0) {
+                            recipientResults.classList.add('d-none');
+                            return;
+                        }
+                        
+                        data.forEach(user => {
+                            const item = document.createElement('a');
+                            item.href = '#';
+                            item.className = 'list-group-item list-group-item-action';
+                            item.innerHTML = `
+                                <div class="d-flex align-items-center">
+                                    <img src="${user.profile_image || '/static/img/default-avatar.png'}" alt="${user.first_name}" class="rounded-circle me-2" width="32" height="32">
+                                    <div>${user.first_name} ${user.last_name}</div>
+                                </div>
+                            `;
+                            
+                            item.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                recipientInput.value = user.username;
+                                recipientResults.classList.add('d-none');
+                            });
+                            
+                            recipientResults.appendChild(item);
+                        });
+                        
+                        recipientResults.classList.remove('d-none');
+                    })
+                    .catch(error => {
+                        console.error('Error searching users:', error);
+                    });
+            }, 300);
+        });
+        
+        // Hide results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!recipientInput.contains(e.target) && !recipientResults.contains(e.target)) {
+                recipientResults.classList.add('d-none');
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
@@ -19,12 +19,12 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
-    
+
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user:
             raise ValidationError('That username is taken. Please choose a different one.')
-    
+
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
@@ -44,13 +44,13 @@ class UpdateProfileForm(FlaskForm):
     bio = TextAreaField('Bio')
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     submit = SubmitField('Update')
-    
+
     def validate_username(self, username):
         if username.data != current_user.username:
             user = User.query.filter_by(username=username.data).first()
             if user:
                 raise ValidationError('That username is taken. Please choose a different one.')
-    
+
     def validate_email(self, email):
         if email.data != current_user.email:
             user = User.query.filter_by(email=email.data).first()
@@ -62,26 +62,26 @@ class UpdateProfileForm(FlaskForm):
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('feed.index'))
-    
+
     form = RegistrationForm()
     result = register_handler(form)
-    
+
     if result:
         return result
-    
+
     return render_template('auth/register.html', title='Register', form=form)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('feed.index'))
-    
+
     form = LoginForm()
     result = login_handler(form)
-    
+
     if result:
         return result
-    
+
     return render_template('auth/login.html', title='Login', form=form)
 
 @auth.route('/logout')
@@ -93,8 +93,8 @@ def logout():
 def edit_profile():
     form = UpdateProfileForm()
     result = update_profile_handler(form)
-    
+
     if result:
         return result
-    
+
     return render_template('auth/edit_profile.html', title='Edit Profile', form=form)

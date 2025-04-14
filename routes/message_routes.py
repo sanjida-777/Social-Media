@@ -33,20 +33,35 @@ class EditMessageForm(FlaskForm):
 def inbox():
     page = request.args.get('page', 1, type=int)
     messages = get_received_messages(page=page)
-    return render_template('messages/inbox.html', title='Inbox', messages=messages)
+    # Temporarily return a simple message for testing
+    return '<h1>Inbox Page</h1><p>This is a temporary page for testing.</p><p><a href="/">Go to Home</a></p>'
 
 @messages.route('/sent')
 @login_required
 def sent():
     page = request.args.get('page', 1, type=int)
     messages = get_sent_messages(page=page)
-    return render_template('messages/sent.html', title='Sent Messages', messages=messages)
+    return render_template('lite/messages/sent.html', title='Sent Messages', messages=messages)
 
 @messages.route('/conversation/<string:username>')
 @login_required
 def conversation(username):
+    # Check if we should use the new Alpine.js template
+    use_alpine = request.args.get('alpine', 'true').lower() == 'true'
+
+    if use_alpine:
+        # For Alpine.js template, we don't need to fetch messages yet
+        # Just return the template directly for testing
+        return render_template('lite/conversation_new.html', username=username)
+
+    # For the regular template, fetch messages
     page = request.args.get('page', 1, type=int)
-    messages, user = get_conversation(username, page=page)
+    try:
+        messages, user = get_conversation(username, page=page)
+    except Exception as e:
+        flash(f'Error loading conversation: {str(e)}', 'danger')
+        return redirect(url_for('messages.inbox'))
+
     form = MessageForm()
     form.recipient.data = username  # Pre-populate recipient field
 
@@ -228,3 +243,61 @@ def api_update_message_status(message_id):
     if isinstance(result, tuple):
         return jsonify(result[0]), result[1]
     return jsonify(result)
+
+@messages.route('/api/messages/<int:message_id>/delete', methods=['POST'])
+@login_required
+def delete_message_api_route(message_id):
+    data = request.json
+    hard_delete = data.get('hard_delete', False)
+
+    # Use the existing handler
+    delete_message_handler(message_id, hard_delete=hard_delete)
+
+    # Return JSON response
+    return jsonify({
+        'success': True,
+        'message': 'Message deleted successfully',
+        'hard_delete': hard_delete
+    })
+
+@messages.route('/api/conversations/<string:username>/delete', methods=['POST'])
+@login_required
+def delete_conversation_api_route(username):
+    data = request.json
+    hard_delete = data.get('hard_delete', False)
+
+    from models.user import User
+    from models.message import Message
+    from utils.db_utils import commit_to_db
+
+    # Find the user
+    user = User.query.filter_by(username=username).first_or_404()
+
+    # Get all messages between current user and the specified user
+    messages = Message.query.filter(
+        ((Message.sender_id == current_user.id) & (Message.recipient_id == user.id)) |
+        ((Message.sender_id == user.id) & (Message.recipient_id == current_user.id))
+    ).all()
+
+    if hard_delete:
+        # Hard delete - completely remove all message content and attachments
+        for message in messages:
+            # Only hard delete messages sent by current user
+            if message.sender_id == current_user.id:
+                message.mark_as_deleted(hard_delete=True)
+            else:
+                # For received messages, just mark as deleted
+                message.mark_as_deleted(hard_delete=False)
+    else:
+        # Soft delete - just mark all messages as deleted
+        for message in messages:
+            message.mark_as_deleted(hard_delete=False)
+
+    commit_to_db()
+
+    # Return JSON response
+    return jsonify({
+        'success': True,
+        'message': 'Conversation deleted successfully',
+        'hard_delete': hard_delete
+    })

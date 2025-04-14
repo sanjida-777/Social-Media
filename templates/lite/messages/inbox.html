@@ -1,0 +1,113 @@
+{% extends "lite/base.html" %}
+
+{% block title %}Messages - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Messages</h5>
+        <div>
+            <a href="{{ url_for('messages.new_message') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-edit me-1"></i> New Message
+            </a>
+            <button class="btn btn-light btn-sm ms-2">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="input-group p-3">
+            <span class="input-group-text bg-light border-0">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" class="form-control bg-light border-0" placeholder="Search messages">
+        </div>
+        
+        <div class="list-group list-group-flush conversation-list">
+            {% if messages.items %}
+                {% for message in messages.items %}
+                    {% set other_user = message.sender if message.sender_id != current_user.id else message.recipient %}
+                    <a href="{{ url_for('messages.conversation', username=other_user.username) }}" class="list-group-item list-group-item-action conversation-item">
+                        <div class="position-relative">
+                            <img src="{{ other_user.profile_image or '/static/img/default-avatar.png' }}" alt="{{ other_user.first_name }}" class="conversation-avatar">
+                            {% if other_user.is_online %}
+                                <span class="position-absolute bottom-0 end-0 bg-success rounded-circle" style="width: 12px; height: 12px; border: 2px solid white;"></span>
+                            {% endif %}
+                        </div>
+                        <div class="conversation-content">
+                            <div class="d-flex justify-content-between">
+                                <div class="conversation-name">{{ other_user.first_name }} {{ other_user.last_name }}</div>
+                                <div class="conversation-time">{{ message.created_at|timeago }}</div>
+                            </div>
+                            <div class="conversation-message {% if not message.read and message.recipient_id == current_user.id %}fw-bold{% endif %}">
+                                {% if message.sender_id == current_user.id %}
+                                    <span class="text-muted">You: </span>
+                                {% endif %}
+                                {{ message.content }}
+                            </div>
+                        </div>
+                        {% if not message.read and message.recipient_id == current_user.id %}
+                            <span class="badge bg-primary rounded-circle ms-2">1</span>
+                        {% endif %}
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-inbox fa-3x text-muted"></i>
+                    </div>
+                    <h5>No messages yet</h5>
+                    <p class="text-muted">When you send or receive messages, they'll appear here.</p>
+                    <a href="{{ url_for('messages.new_message') }}" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i> Start a new conversation
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if messages.pages > 1 %}
+            <nav aria-label="Messages pagination" class="p-3">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if messages.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('messages.inbox', page=messages.prev_num) }}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for page_num in messages.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == messages.page %}
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="{{ url_for('messages.inbox', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('messages.inbox', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">...</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if messages.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('messages.inbox', page=messages.next_num) }}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

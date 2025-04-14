@@ -1,0 +1,582 @@
+{% extends "lite/layout.html" %}
+
+{% block title %}SocialLite - Chat with {{ username }}{% endblock %}
+
+{% block styles %}
+<style>
+    /* Message deletion styles */
+    .message-deleted {
+        opacity: 0.7;
+    }
+    
+    .message-actions {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        display: flex;
+        gap: 4px;
+    }
+    
+    .message-bubble:hover .message-actions {
+        opacity: 1;
+    }
+    
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .action-btn.edit:hover {
+        background-color: var(--accent-color);
+    }
+    
+    .action-btn.delete:hover {
+        background-color: var(--danger-color);
+    }
+    
+    /* Delete modal styles */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        background-color: var(--bg-secondary);
+        border-radius: var(--radius-md);
+        width: 90%;
+        max-width: 320px;
+        overflow: hidden;
+    }
+    
+    .modal-header {
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--divider-color);
+    }
+    
+    .modal-body {
+        padding: var(--spacing-md);
+    }
+    
+    .modal-footer {
+        padding: var(--spacing-md);
+        border-top: 1px solid var(--divider-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--spacing-md);
+    }
+    
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+        background-color: var(--accent-color);
+        color: white;
+    }
+    
+    .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: var(--bg-tertiary);
+        color: var(--text-primary);
+    }
+    
+    .delete-option {
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-md);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    .delete-option:hover {
+        background-color: var(--bg-tertiary);
+    }
+    
+    .delete-option.selected {
+        background-color: var(--bg-tertiary);
+        border: 1px solid var(--accent-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="chatApp()" class="chat-container">
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <a href="{{ url_for('messages.inbox') }}" class="chat-header-back">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="conversation-avatar" style="width: 40px; height: 40px; margin-right: var(--spacing-md);">
+            <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            <div class="online-indicator"></div>
+        </div>
+        <div class="chat-header-info">
+            <div class="chat-header-name">{{ username }}</div>
+            <div class="chat-header-status">Online</div>
+        </div>
+        <div class="chat-header-actions">
+            <button @click="showDeleteConversationModal = true" class="navbar-action" aria-label="Delete conversation">
+                <i class="fas fa-trash"></i>
+            </button>
+            <button class="navbar-action" aria-label="Info">
+                <i class="fas fa-info-circle"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Chat Messages -->
+    <div class="chat-messages" id="chat-messages">
+        <!-- Date Separator -->
+        <div style="text-align: center; margin: var(--spacing-md) 0;">
+            <span style="background-color: var(--bg-tertiary); padding: var(--spacing-xs) var(--spacing-md); border-radius: 16px; font-size: var(--font-xs); color: var(--text-secondary);">Today</span>
+        </div>
+        
+        <!-- Messages -->
+        <template x-for="(message, index) in messages" :key="index">
+            <div>
+                <div :class="'message ' + (message.sent ? 'sent' : 'received')">
+                    <div 
+                        :class="'message-bubble ' + (message.deleted ? 'message-deleted' : '')" 
+                        style="position: relative;"
+                    >
+                        <!-- Message content -->
+                        <template x-if="message.deleted">
+                            <div>
+                                <i class="fas fa-ban me-1"></i>
+                                <span x-text="message.content ? message.content : 'This message was deleted'"></span>
+                            </div>
+                        </template>
+                        
+                        <template x-if="!message.deleted">
+                            <div>
+                                <span x-text="message.content"></span>
+                                
+                                <!-- Message image if present -->
+                                <template x-if="message.image">
+                                    <div style="margin-top: var(--spacing-sm);">
+                                        <img :src="message.image" alt="Message attachment" style="max-width: 200px; border-radius: var(--radius-sm);">
+                                    </div>
+                                </template>
+                                
+                                <!-- Message actions for sent messages -->
+                                <template x-if="message.sent">
+                                    <div class="message-actions">
+                                        <button class="action-btn edit" title="Edit message">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button @click="openDeleteModal(index)" class="action-btn delete" title="Delete message">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <!-- Message status for sent messages -->
+                    <template x-if="message.sent">
+                        <div class="message-status">
+                            <template x-if="message.seen">
+                                <span><i class="fas fa-check-double"></i> Seen</span>
+                            </template>
+                            <template x-if="!message.seen && message.delivered">
+                                <span><i class="fas fa-check"></i> Delivered</span>
+                            </template>
+                            <template x-if="!message.seen && !message.delivered">
+                                <span><i class="fas fa-check"></i> Sent</span>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Message time -->
+                <template x-if="message.showTime">
+                    <div style="font-size: var(--font-xs); color: var(--text-secondary); margin: 4px 0 var(--spacing-md) 50px;" x-text="message.time"></div>
+                </template>
+            </div>
+        </template>
+        
+        <!-- Typing Indicator -->
+        <div x-show="isTyping" class="message received">
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chat Input -->
+    <div class="chat-input">
+        <div class="chat-input-actions">
+            <button class="chat-input-action" aria-label="Attach file">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <button class="chat-input-action" aria-label="Send photo">
+                <i class="fas fa-camera"></i>
+            </button>
+        </div>
+        <input 
+            type="text" 
+            class="chat-input-field" 
+            placeholder="Message..." 
+            x-model="newMessage" 
+            @keyup.enter="sendMessage()"
+            @focus="startTyping()"
+            @blur="stopTyping()"
+        >
+        <button @click="sendMessage()" class="chat-input-send" aria-label="Send message">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+    
+    <!-- Delete Message Modal -->
+    <div x-show="showDeleteModal" class="modal" @click.self="showDeleteModal = false">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Delete Message</h3>
+            </div>
+            <div class="modal-body">
+                <div 
+                    @click="deleteOption = 'standard'" 
+                    :class="'delete-option ' + (deleteOption === 'standard' ? 'selected' : '')"
+                >
+                    <div style="display: flex; align-items: center; margin-bottom: var(--spacing-xs);">
+                        <i class="fas fa-trash me-2"></i>
+                        <strong>Standard Delete</strong>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: var(--font-sm);">
+                        Message will be marked as deleted but still visible to everyone.
+                    </div>
+                </div>
+                
+                <div 
+                    @click="deleteOption = 'permanent'" 
+                    :class="'delete-option ' + (deleteOption === 'permanent' ? 'selected' : '')"
+                >
+                    <div style="display: flex; align-items: center; margin-bottom: var(--spacing-xs);">
+                        <i class="fas fa-fire me-2" style="color: var(--danger-color);"></i>
+                        <strong>Permanent Delete</strong>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: var(--font-sm);">
+                        Content will be permanently removed with no trace.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button @click="showDeleteModal = false" class="btn btn-secondary">Cancel</button>
+                <button @click="deleteMessage()" class="btn" :class="deleteOption === 'permanent' ? 'btn-danger' : 'btn-primary'">Delete</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Conversation Modal -->
+    <div x-show="showDeleteConversationModal" class="modal" @click.self="showDeleteConversationModal = false">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Delete Conversation</h3>
+            </div>
+            <div class="modal-body">
+                <div 
+                    @click="deleteConversationOption = 'standard'" 
+                    :class="'delete-option ' + (deleteConversationOption === 'standard' ? 'selected' : '')"
+                >
+                    <div style="display: flex; align-items: center; margin-bottom: var(--spacing-xs);">
+                        <i class="fas fa-trash me-2"></i>
+                        <strong>Standard Delete</strong>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: var(--font-sm);">
+                        Messages will be marked as deleted but still visible to everyone.
+                    </div>
+                </div>
+                
+                <div 
+                    @click="deleteConversationOption = 'permanent'" 
+                    :class="'delete-option ' + (deleteConversationOption === 'permanent' ? 'selected' : '')"
+                >
+                    <div style="display: flex; align-items: center; margin-bottom: var(--spacing-xs);">
+                        <i class="fas fa-fire me-2" style="color: var(--danger-color);"></i>
+                        <strong>Permanent Delete</strong>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: var(--font-sm);">
+                        All content will be permanently removed with no trace.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button @click="showDeleteConversationModal = false" class="btn btn-secondary">Cancel</button>
+                <button @click="deleteConversation()" class="btn" :class="deleteConversationOption === 'permanent' ? 'btn-danger' : 'btn-primary'">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function chatApp() {
+        return {
+            messages: [
+                {
+                    content: "Hey, how's it going?",
+                    sent: false,
+                    deleted: false,
+                    time: "10:15 AM",
+                    showTime: false
+                },
+                {
+                    content: "Not bad! Just working on a new project. How about you?",
+                    sent: true,
+                    deleted: false,
+                    delivered: true,
+                    seen: true,
+                    time: "10:16 AM",
+                    showTime: false
+                },
+                {
+                    content: "I'm good! Just got back from vacation. It was amazing!",
+                    sent: false,
+                    deleted: false,
+                    time: "10:18 AM",
+                    showTime: true
+                },
+                {
+                    content: "That's great! Where did you go?",
+                    sent: true,
+                    deleted: false,
+                    delivered: true,
+                    seen: true,
+                    time: "10:20 AM",
+                    showTime: false
+                },
+                {
+                    content: "Went to the beach! Check out this photo:",
+                    sent: false,
+                    deleted: false,
+                    time: "10:22 AM",
+                    showTime: false
+                },
+                {
+                    content: "",
+                    sent: false,
+                    deleted: false,
+                    image: "https://source.unsplash.com/random/300x200/?beach",
+                    time: "10:22 AM",
+                    showTime: false
+                },
+                {
+                    content: "Wow, that looks amazing! I need a vacation too.",
+                    sent: true,
+                    deleted: false,
+                    delivered: true,
+                    seen: true,
+                    time: "10:25 AM",
+                    showTime: true
+                }
+            ],
+            newMessage: "",
+            isTyping: false,
+            showDeleteModal: false,
+            showDeleteConversationModal: false,
+            deleteOption: "standard",
+            deleteConversationOption: "standard",
+            selectedMessageIndex: null,
+            
+            init() {
+                this.$nextTick(() => {
+                    this.scrollToBottom();
+                });
+            },
+            
+            scrollToBottom() {
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            },
+            
+            sendMessage() {
+                if (!this.newMessage.trim()) return;
+                
+                // Add new message
+                this.messages.push({
+                    content: this.newMessage.trim(),
+                    sent: true,
+                    deleted: false,
+                    delivered: false,
+                    seen: false,
+                    time: this.getCurrentTime(),
+                    showTime: false
+                });
+                
+                // Clear input
+                this.newMessage = "";
+                
+                // Scroll to bottom
+                this.$nextTick(() => {
+                    this.scrollToBottom();
+                });
+                
+                // Simulate message delivery and response
+                setTimeout(() => {
+                    // Update message status to delivered
+                    this.messages[this.messages.length - 1].delivered = true;
+                    
+                    // Start typing indicator
+                    this.isTyping = true;
+                    
+                    // Simulate response after delay
+                    setTimeout(() => {
+                        // Hide typing indicator
+                        this.isTyping = false;
+                        
+                        // Update message status to seen
+                        this.messages[this.messages.length - 1].seen = true;
+                        
+                        // Add response message
+                        const responses = [
+                            "That's great!",
+                            "I agree!",
+                            "Interesting point.",
+                            "Let me think about that.",
+                            "Sounds good to me!",
+                            "Haha, that's funny!",
+                            "I see what you mean.",
+                            "Thanks for sharing that.",
+                            "I didn't know that!",
+                            "Tell me more about it."
+                        ];
+                        
+                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                        
+                        // Add response message
+                        this.messages.push({
+                            content: randomResponse,
+                            sent: false,
+                            deleted: false,
+                            time: this.getCurrentTime(),
+                            showTime: true
+                        });
+                        
+                        // Scroll to bottom
+                        this.$nextTick(() => {
+                            this.scrollToBottom();
+                        });
+                    }, 1500);
+                }, 1000);
+            },
+            
+            getCurrentTime() {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const formattedHours = hours % 12 || 12;
+                const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+                
+                return `${formattedHours}:${formattedMinutes} ${ampm}`;
+            },
+            
+            startTyping() {
+                // Only show typing indicator if not already typing
+                if (!this.isTyping) {
+                    setTimeout(() => {
+                        this.isTyping = true;
+                        this.$nextTick(() => {
+                            this.scrollToBottom();
+                        });
+                    }, 1000);
+                }
+            },
+            
+            stopTyping() {
+                setTimeout(() => {
+                    this.isTyping = false;
+                }, 1000);
+            },
+            
+            openDeleteModal(index) {
+                this.selectedMessageIndex = index;
+                this.showDeleteModal = true;
+            },
+            
+            deleteMessage() {
+                if (this.selectedMessageIndex === null) return;
+                
+                if (this.deleteOption === 'standard') {
+                    // Standard delete - mark as deleted
+                    this.messages[this.selectedMessageIndex].deleted = true;
+                    this.messages[this.selectedMessageIndex].content = "This message was deleted";
+                } else {
+                    // Permanent delete - remove content completely
+                    this.messages[this.selectedMessageIndex].deleted = true;
+                    this.messages[this.selectedMessageIndex].content = "";
+                    this.messages[this.selectedMessageIndex].image = null;
+                }
+                
+                // Close modal
+                this.showDeleteModal = false;
+                
+                // In a real app, you would send a request to the server here
+                // Example:
+                // fetch('/messages/api/messages/' + messageId + '/delete', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify({ 
+                //         hard_delete: this.deleteOption === 'permanent'
+                //     }),
+                // });
+            },
+            
+            deleteConversation() {
+                // In a real app, you would send a request to the server here
+                // Example:
+                // fetch('/messages/conversation/{{ username }}/delete', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify({ 
+                //         hard_delete: this.deleteConversationOption === 'permanent'
+                //     }),
+                // }).then(() => {
+                //     window.location.href = '/messages/inbox';
+                // });
+                
+                // For demo purposes, redirect to inbox
+                window.location.href = '{{ url_for("messages.inbox") }}';
+            }
+        };
+    }
+</script>
+{% endblock %}

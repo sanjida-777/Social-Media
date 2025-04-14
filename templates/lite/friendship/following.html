@@ -1,0 +1,152 @@
+{% extends "lite/base.html" %}
+
+{% block title %}People {{ user.first_name }} Follows - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('profile.view', username=user.username) }}" class="btn btn-light rounded-circle me-2">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h5 class="mb-0">People {{ user.first_name }} Follows</h5>
+        </div>
+        <div class="input-group" style="max-width: 300px;">
+            <span class="input-group-text bg-light border-0">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" class="form-control bg-light border-0" placeholder="Search following">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">{{ follows.total }} Following</h6>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="followingSortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Recently Added
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="followingSortDropdown">
+                    <li><a class="dropdown-item" href="#">Recently Added</a></li>
+                    <li><a class="dropdown-item" href="#">Alphabetical</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row g-3">
+            {% if follows.items %}
+                {% for follow in follows.items %}
+                    {% set followed = follow.followed %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <img src="{{ followed.profile_image or '/static/img/default-avatar.png' }}" alt="{{ followed.first_name }}" class="rounded-circle me-3" width="80" height="80">
+                                    <div>
+                                        <h6 class="card-title mb-1">{{ followed.first_name }} {{ followed.last_name }}</h6>
+                                        <p class="text-muted small mb-2">
+                                            {% if follow.mutual_friends %}
+                                                {{ follow.mutual_friends }} mutual friends
+                                            {% else %}
+                                                No mutual friends
+                                            {% endif %}
+                                        </p>
+                                        <div class="d-flex">
+                                            {% if followed.id != current_user.id %}
+                                                {% if followed.is_friend_with(current_user) %}
+                                                    <button class="btn btn-sm btn-light me-2">
+                                                        <i class="fas fa-user-check me-1"></i> Friends
+                                                    </button>
+                                                {% elif followed.has_friend_request_from(current_user) %}
+                                                    <button class="btn btn-sm btn-light me-2">
+                                                        <i class="fas fa-user-clock me-1"></i> Request Sent
+                                                    </button>
+                                                {% elif current_user.has_friend_request_from(followed) %}
+                                                    <form action="{{ url_for('friendship.accept_request', username=followed.username) }}" method="POST" class="me-2">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-user-plus me-1"></i> Accept
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <form action="{{ url_for('friendship.send_request', username=followed.username) }}" method="POST" class="me-2">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-user-plus me-1"></i> Add Friend
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                                
+                                                <a href="{{ url_for('messages.conversation', username=followed.username) }}" class="btn btn-sm btn-light me-2">
+                                                    <i class="fas fa-comment me-1"></i> Message
+                                                </a>
+                                            {% endif %}
+                                            
+                                            <a href="{{ url_for('profile.view', username=followed.username) }}" class="btn btn-sm btn-light">
+                                                <i class="fas fa-user me-1"></i> Profile
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-user-plus fa-3x text-muted"></i>
+                        </div>
+                        <h5>Not following anyone yet</h5>
+                        <p class="text-muted">When {{ user.first_name }} follows people, they'll appear here.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if follows.pages > 1 %}
+            <nav aria-label="Following pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if follows.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('friendship.following', user_id=user.id, page=follows.prev_num) }}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for page_num in follows.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == follows.page %}
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="{{ url_for('friendship.following', user_id=user.id, page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('friendship.following', user_id=user.id, page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">...</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if follows.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('friendship.following', user_id=user.id, page=follows.next_num) }}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -18,6 +18,7 @@ from routes.profile_routes import profile
 from routes.message_routes import messages
 from routes.friendship_routes import friendship
 from routes.api_routes import api
+from routes.err_routers import bp as err_bp
 
 def create_app(config_name='default'):
     """Create and configure the Flask application."""
@@ -40,7 +41,8 @@ def create_app(config_name='default'):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        # Use Session.get() instead of Query.get() to avoid SQLAlchemy deprecation warning
+        return db.session.get(User, int(user_id))
 
     # Register blueprints
     app.register_blueprint(auth, url_prefix='/auth')
@@ -49,6 +51,24 @@ def create_app(config_name='default'):
     app.register_blueprint(messages, url_prefix='/messages')
     app.register_blueprint(friendship, url_prefix='/friendship')
     app.register_blueprint(api)
+    app.register_blueprint(err_bp, url_prefix='/error')
+
+    # Register error handlers
+    @app.errorhandler(404)
+    def page_not_found(_):
+        return redirect(url_for('err.handle_404'))
+
+    @app.errorhandler(403)
+    def forbidden(_):
+        return redirect(url_for('err.handle_403'))
+
+    @app.errorhandler(405)
+    def method_not_allowed(_):
+        return redirect(url_for('err.handle_405'))
+
+    @app.errorhandler(500)
+    def server_error(_):
+        return redirect(url_for('err.handle_500'))
 
     # Root route redirects to feed
     @app.route('/')
@@ -71,6 +91,5 @@ def create_app(config_name='default'):
 
 if __name__ == '__main__':
     app = create_app()
-    # Use SocketIO's run method instead of app.run
-    socketio = socket_events.socketio
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    # Use standard Flask run method for testing
+    app.run(debug=True, port=5000)

@@ -1,0 +1,118 @@
+{% extends "lite/base.html" %}
+
+{% block title %}Edit Profile - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-white p-3 d-flex align-items-center">
+        <a href="{{ url_for('profile.view', username=current_user.username) }}" class="btn btn-light rounded-circle me-2">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h5 class="mb-0">Edit Profile</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('auth.edit_profile') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="mb-3">
+                <label class="form-label">Profile Picture</label>
+                <div class="d-flex align-items-center">
+                    <img src="{{ current_user.profile_image or '/static/img/default-avatar.png' }}" alt="Profile" class="rounded-circle me-3" width="100" height="100">
+                    <div>
+                        <input type="file" class="form-control" name="picture" accept="image/*">
+                        <div class="form-text">Recommended size: 400x400 pixels</div>
+                        {% if form.picture.errors %}
+                            {% for error in form.picture.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" value="{{ form.username.data or current_user.username }}" required>
+                {% if form.username.errors %}
+                    {% for error in form.username.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ form.first_name.data or current_user.first_name }}" required>
+                    {% if form.first_name.errors %}
+                        {% for error in form.first_name.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ form.last_name.data or current_user.last_name }}" required>
+                    {% if form.last_name.errors %}
+                        {% for error in form.last_name.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ form.email.data or current_user.email }}" required>
+                {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea class="form-control" id="bio" name="bio" rows="3">{{ form.bio.data or current_user.bio or '' }}</textarea>
+                {% if form.bio.errors %}
+                    {% for error in form.bio.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="work" class="form-label">Work</label>
+                <input type="text" class="form-control" id="work" name="work" value="{{ current_user.work or '' }}">
+            </div>
+            
+            <div class="mb-3">
+                <label for="education" class="form-label">Education</label>
+                <input type="text" class="form-control" id="education" name="education" value="{{ current_user.education or '' }}">
+            </div>
+            
+            <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location or '' }}">
+            </div>
+            
+            <div class="mb-3">
+                <label for="relationship_status" class="form-label">Relationship Status</label>
+                <select class="form-select" id="relationship_status" name="relationship_status">
+                    <option value="" {% if not current_user.relationship_status %}selected{% endif %}>Select status</option>
+                    <option value="Single" {% if current_user.relationship_status == 'Single' %}selected{% endif %}>Single</option>
+                    <option value="In a relationship" {% if current_user.relationship_status == 'In a relationship' %}selected{% endif %}>In a relationship</option>
+                    <option value="Engaged" {% if current_user.relationship_status == 'Engaged' %}selected{% endif %}>Engaged</option>
+                    <option value="Married" {% if current_user.relationship_status == 'Married' %}selected{% endif %}>Married</option>
+                    <option value="It's complicated" {% if current_user.relationship_status == "It's complicated" %}selected{% endif %}>It's complicated</option>
+                </select>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('profile.view', username=current_user.username) }}" class="btn btn-light">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

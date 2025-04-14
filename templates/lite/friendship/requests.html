@@ -1,0 +1,113 @@
+{% extends "lite/base.html" %}
+
+{% block title %}Friend Requests - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-white p-3">
+        <h5 class="mb-0">Friend Requests</h5>
+    </div>
+    <div class="card-body p-0">
+        <ul class="nav nav-tabs nav-fill">
+            <li class="nav-item">
+                <a class="nav-link active" href="#received" data-bs-toggle="tab">Received <span class="badge bg-danger">{{ received_requests|length }}</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#sent" data-bs-toggle="tab">Sent <span class="badge bg-secondary">{{ sent_requests|length }}</span></a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- Received Requests Tab -->
+            <div class="tab-pane fade show active" id="received">
+                <div class="p-3">
+                    {% if received_requests %}
+                        {% for request in received_requests %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <img src="{{ request.sender.profile_image or '/static/img/default-avatar.png' }}" alt="{{ request.sender.first_name }}" class="rounded-circle me-3" width="80" height="80">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title mb-1">{{ request.sender.first_name }} {{ request.sender.last_name }}</h6>
+                                            <p class="text-muted small mb-3">
+                                                {% if request.mutual_friends %}
+                                                    {{ request.mutual_friends }} mutual friends
+                                                {% else %}
+                                                    No mutual friends
+                                                {% endif %}
+                                            </p>
+                                            <div class="d-flex">
+                                                <form action="{{ url_for('friendship.accept_request', username=request.sender.username) }}" method="POST" class="me-2">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-primary">Confirm</button>
+                                                </form>
+                                                <form action="{{ url_for('friendship.reject_request', username=request.sender.username) }}" method="POST">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-light">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="text-muted small">
+                                            {{ request.created_at|timeago }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-user-friends fa-3x text-muted"></i>
+                            </div>
+                            <h5>No friend requests</h5>
+                            <p class="text-muted">When someone sends you a friend request, you'll see it here.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Sent Requests Tab -->
+            <div class="tab-pane fade" id="sent">
+                <div class="p-3">
+                    {% if sent_requests %}
+                        {% for request in sent_requests %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <img src="{{ request.recipient.profile_image or '/static/img/default-avatar.png' }}" alt="{{ request.recipient.first_name }}" class="rounded-circle me-3" width="80" height="80">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title mb-1">{{ request.recipient.first_name }} {{ request.recipient.last_name }}</h6>
+                                            <p class="text-muted small mb-3">
+                                                {% if request.mutual_friends %}
+                                                    {{ request.mutual_friends }} mutual friends
+                                                {% else %}
+                                                    No mutual friends
+                                                {% endif %}
+                                            </p>
+                                            <form action="{{ url_for('friendship.cancel_request', username=request.recipient.username) }}" method="POST">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-light">Cancel Request</button>
+                                            </form>
+                                        </div>
+                                        <div class="text-muted small">
+                                            {{ request.created_at|timeago }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-paper-plane fa-3x text-muted"></i>
+                            </div>
+                            <h5>No sent requests</h5>
+                            <p class="text-muted">When you send friend requests, they'll appear here.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

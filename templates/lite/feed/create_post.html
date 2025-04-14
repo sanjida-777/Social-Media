@@ -1,0 +1,112 @@
+{% extends "lite/base.html" %}
+
+{% block title %}{{ legend }} - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-white p-3">
+                <h5 class="mb-0">{{ legend }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="{{ current_user.profile_image or '/static/img/default-avatar.png' }}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
+                            <div>
+                                <div class="fw-bold">{{ current_user.first_name }} {{ current_user.last_name }}</div>
+                                <select class="form-select form-select-sm mt-1" style="width: auto;">
+                                    <option>Public</option>
+                                    <option>Friends</option>
+                                    <option>Only me</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <textarea class="form-control border-0" name="content" rows="5" placeholder="What's on your mind, {{ current_user.first_name }}?" required>{{ form.content.data if form.content.data }}</textarea>
+                        
+                        {% if form.content.errors %}
+                            {% for error in form.content.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div id="imagePreview" class="mb-3 {% if not form.image.data %}d-none{% endif %}">
+                        <div class="position-relative">
+                            {% if form.image.data %}
+                                <img src="{{ url_for('static', filename='img/post_images/' + form.image.data) }}" alt="Post image" class="img-fluid rounded">
+                            {% else %}
+                                <img id="previewImage" src="#" alt="Preview" class="img-fluid rounded">
+                            {% endif %}
+                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2" id="removeImage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="border rounded p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>Add to your post</div>
+                            <div>
+                                <label for="image" class="btn text-success mb-0" style="cursor: pointer;">
+                                    <i class="fas fa-images"></i>
+                                </label>
+                                <input type="file" class="d-none" id="image" name="image" accept="image/*">
+                                <button type="button" class="btn text-primary">
+                                    <i class="fas fa-user-tag"></i>
+                                </button>
+                                <button type="button" class="btn text-warning">
+                                    <i class="fas fa-smile"></i>
+                                </button>
+                                <button type="button" class="btn text-danger">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </button>
+                                <button type="button" class="btn text-info">
+                                    <i class="fas fa-flag"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">{{ 'Update Post' if legend == 'Update Post' else 'Post' }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('image');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const removeImage = document.getElementById('removeImage');
+        
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    imagePreview.classList.remove('d-none');
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        removeImage.addEventListener('click', function() {
+            imageInput.value = '';
+            imagePreview.classList.add('d-none');
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

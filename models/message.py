@@ -132,9 +132,18 @@ class Message(db.Model):
 
     def to_dict(self):
         """Convert message to dictionary for API responses."""
+        # For deleted messages, handle content appropriately
+        if self.deleted:
+            if not self.content:  # Hard deleted (empty content)
+                display_content = "This message was deleted"
+            else:  # Soft deleted (content is already "This message was deleted")
+                display_content = self.content
+        else:
+            display_content = self.content
+
         return {
             'id': self.id,
-            'content': self.content if not self.deleted else "This message was deleted",
+            'content': display_content,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'read': self.read,
@@ -152,7 +161,7 @@ class Message(db.Model):
             'failure_reason': self.failure_reason,
             'is_spam': self.is_spam,
             'spam_score': self.spam_score,
-            'attachment_filename': self.attachment_filename,
-            'attachment_type': self.attachment_type,
-            'has_attachment': bool(self.attachment_filename)
+            'attachment_filename': self.attachment_filename if not (self.deleted and not self.content) else None,
+            'attachment_type': self.attachment_type if not (self.deleted and not self.content) else None,
+            'has_attachment': bool(self.attachment_filename) and not (self.deleted and not self.content)
         }

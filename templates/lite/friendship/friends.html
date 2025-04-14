@@ -1,0 +1,162 @@
+{% extends "lite/base.html" %}
+
+{% block title %}{{ user.first_name }}'s Friends - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('profile.view', username=user.username) }}" class="btn btn-light rounded-circle me-2">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h5 class="mb-0">{{ user.first_name }}'s Friends</h5>
+        </div>
+        <div class="input-group" style="max-width: 300px;">
+            <span class="input-group-text bg-light border-0">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" class="form-control bg-light border-0" placeholder="Search friends">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">{{ friendships.total }} Friends</h6>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="friendSortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Recently Added
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="friendSortDropdown">
+                    <li><a class="dropdown-item" href="#">Recently Added</a></li>
+                    <li><a class="dropdown-item" href="#">Alphabetical</a></li>
+                    <li><a class="dropdown-item" href="#">Recently Interacted</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row g-3">
+            {% if friendships.items %}
+                {% for friendship in friendships.items %}
+                    {% set friend = friendship.friend1 if friendship.friend1_id != user.id else friendship.friend2 %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <img src="{{ friend.profile_image or '/static/img/default-avatar.png' }}" alt="{{ friend.first_name }}" class="rounded-circle me-3" width="80" height="80">
+                                    <div>
+                                        <h6 class="card-title mb-1">{{ friend.first_name }} {{ friend.last_name }}</h6>
+                                        <p class="text-muted small mb-2">
+                                            {% if friendship.mutual_friends %}
+                                                {{ friendship.mutual_friends }} mutual friends
+                                            {% else %}
+                                                No mutual friends
+                                            {% endif %}
+                                        </p>
+                                        <div class="d-flex">
+                                            <a href="{{ url_for('messages.conversation', username=friend.username) }}" class="btn btn-sm btn-primary me-2">
+                                                <i class="fas fa-comment me-1"></i> Message
+                                            </a>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-h"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="{{ url_for('profile.view', username=friend.username) }}">View Profile</a></li>
+                                                    <li><a class="dropdown-item" href="#">Add to Close Friends</a></li>
+                                                    <li><a class="dropdown-item" href="#">Unfollow</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#unfriendModal{{ friend.id }}">
+                                                            Unfriend
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Unfriend Modal -->
+                        <div class="modal fade" id="unfriendModal{{ friend.id }}" tabindex="-1" aria-labelledby="unfriendModalLabel{{ friend.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="unfriendModalLabel{{ friend.id }}">Unfriend {{ friend.first_name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to remove {{ friend.first_name }} {{ friend.last_name }} as a friend?</p>
+                                        <p class="text-muted">{{ friend.first_name }} will not be notified that you removed them as a friend.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{{ url_for('friendship.unfriend', username=friend.username) }}" method="POST">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-danger">Confirm</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-user-friends fa-3x text-muted"></i>
+                        </div>
+                        <h5>No friends yet</h5>
+                        <p class="text-muted">When {{ user.first_name }} adds friends, they'll appear here.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if friendships.pages > 1 %}
+            <nav aria-label="Friend list pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if friendships.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('friendship.friends', user_id=user.id, page=friendships.prev_num) }}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for page_num in friendships.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == friendships.page %}
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="{{ url_for('friendship.friends', user_id=user.id, page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('friendship.friends', user_id=user.id, page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">...</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if friendships.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('friendship.friends', user_id=user.id, page=friendships.next_num) }}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

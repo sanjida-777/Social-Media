@@ -1,0 +1,215 @@
+{% extends "lite/base.html" %}
+
+{% block title %}Messages - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-white p-3">
+                <h5 class="mb-0">Messages</h5>
+                <div class="input-group mt-2">
+                    <span class="input-group-text bg-light border-0">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control bg-light border-0" placeholder="Search messages">
+                </div>
+            </div>
+            <div class="list-group list-group-flush conversation-list">
+                {% for i in range(1, 8) %}
+                <a href="{{ url_for('messages.conversation', user_id=i) }}" class="list-group-item list-group-item-action conversation-item {% if i == 1 %}active{% endif %}">
+                    <div class="position-relative">
+                        <img src="https://source.unsplash.com/random/100x100?person,{{ i + 40 }}" alt="User" class="conversation-avatar">
+                        <span class="position-absolute bottom-0 end-0 bg-success rounded-circle" style="width: 12px; height: 12px; border: 2px solid white;"></span>
+                    </div>
+                    <div class="conversation-content">
+                        <div class="d-flex justify-content-between">
+                            <div class="conversation-name">Friend {{ i }}</div>
+                            <div class="conversation-time">{{ (now - i|int * 600)|time }}</div>
+                        </div>
+                        <div class="conversation-message">
+                            {{ ["Hey, have you watched the latest episode?", 
+                               "What do you think about the new anime season?", 
+                               "I'm going to the anime convention next month!", 
+                               "Did you read the latest manga chapter?", 
+                               "The animation in this episode was amazing!", 
+                               "Let's meet up at the cosplay event", 
+                               "I just got some new anime merch!"][i-1] }}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white p-3 d-flex align-items-center">
+                <div class="position-relative me-3">
+                    <img src="https://source.unsplash.com/random/100x100?person,41" alt="User" class="rounded-circle" width="48" height="48">
+                    <span class="position-absolute bottom-0 end-0 bg-success rounded-circle" style="width: 12px; height: 12px; border: 2px solid white;"></span>
+                </div>
+                <div>
+                    <h5 class="mb-0">Friend 1</h5>
+                    <div class="small text-success">Online</div>
+                </div>
+                <div class="ms-auto">
+                    <button class="btn btn-light rounded-circle">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="btn btn-light rounded-circle">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="btn btn-light rounded-circle">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body bg-light" style="height: 400px; overflow-y: auto;">
+                <div class="d-flex flex-column">
+                    <!-- Date separator -->
+                    <div class="text-center my-3">
+                        <span class="badge bg-white text-muted">Today</span>
+                    </div>
+                    
+                    <!-- Received messages -->
+                    <div class="d-flex mb-3">
+                        <img src="https://source.unsplash.com/random/100x100?person,41" alt="User" class="rounded-circle align-self-end me-2" width="32" height="32">
+                        <div>
+                            <div class="message message-received">
+                                Hey, have you watched the latest episode?
+                            </div>
+                            <div class="message message-received mt-1">
+                                It was amazing! The fight scene was epic!
+                            </div>
+                            <div class="small text-muted mt-1">10:15 AM</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sent messages -->
+                    <div class="d-flex flex-column align-items-end mb-3">
+                        <div class="message message-sent">
+                            Not yet! I'm planning to watch it tonight.
+                        </div>
+                        <div class="message message-sent mt-1">
+                            No spoilers please! 😅
+                        </div>
+                        <div class="small text-muted mt-1">10:17 AM</div>
+                    </div>
+                    
+                    <!-- Received messages -->
+                    <div class="d-flex mb-3">
+                        <img src="https://source.unsplash.com/random/100x100?person,41" alt="User" class="rounded-circle align-self-end me-2" width="32" height="32">
+                        <div>
+                            <div class="message message-received">
+                                Don't worry, I won't spoil it for you!
+                            </div>
+                            <div class="message message-received mt-1">
+                                But you're going to love it! The character development is incredible.
+                            </div>
+                            <div class="small text-muted mt-1">10:20 AM</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sent messages -->
+                    <div class="d-flex flex-column align-items-end mb-3">
+                        <div class="message message-sent">
+                            I'm really excited to watch it! I've been waiting for this episode for weeks.
+                        </div>
+                        <div class="small text-muted mt-1">10:22 AM</div>
+                    </div>
+                    
+                    <!-- Received messages -->
+                    <div class="d-flex mb-3">
+                        <img src="https://source.unsplash.com/random/100x100?person,41" alt="User" class="rounded-circle align-self-end me-2" width="32" height="32">
+                        <div>
+                            <div class="message message-received">
+                                Let me know what you think after you watch it!
+                            </div>
+                            <div class="small text-muted mt-1">10:25 AM</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Typing indicator -->
+                    <div class="d-flex mb-3">
+                        <img src="https://source.unsplash.com/random/100x100?person,41" alt="User" class="rounded-circle align-self-end me-2" width="32" height="32">
+                        <div class="message message-received" style="min-width: 60px;">
+                            <div class="typing-indicator">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white p-3">
+                <div class="input-group">
+                    <button class="btn btn-light">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <input type="text" class="form-control" placeholder="Type a message...">
+                    <button class="btn btn-light">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                    <button class="btn btn-light">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+    }
+    
+    .typing-indicator span {
+        height: 8px;
+        width: 8px;
+        background-color: #bbb;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 2px;
+        animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-indicator span:nth-child(1) {
+        animation-delay: 0s;
+    }
+    
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0% {
+            transform: translateY(0px);
+            background-color: #bbb;
+        }
+        50% {
+            transform: translateY(-5px);
+            background-color: #999;
+        }
+        100% {
+            transform: translateY(0px);
+            background-color: #bbb;
+        }
+    }
+</style>
+{% endblock %}

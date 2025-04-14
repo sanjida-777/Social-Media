@@ -1,0 +1,229 @@
+{% extends "lite/base.html" %}
+
+{% block title %}Friends - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-white p-3">
+        <h5 class="mb-0">Friends</h5>
+        <div class="input-group mt-2">
+            <span class="input-group-text bg-light border-0">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" class="form-control bg-light border-0" placeholder="Search friends">
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <ul class="nav nav-tabs nav-fill">
+            <li class="nav-item">
+                <a class="nav-link active" href="#all-friends" data-bs-toggle="tab">All Friends</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#requests" data-bs-toggle="tab">Friend Requests <span class="badge bg-danger">3</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#suggestions" data-bs-toggle="tab">Suggestions</a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- All Friends Tab -->
+            <div class="tab-pane fade show active" id="all-friends">
+                <div class="p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">{{ friend_count|default(25) }} Friends</h6>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="friendSortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Recently Added
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="friendSortDropdown">
+                                <li><a class="dropdown-item" href="#">Recently Added</a></li>
+                                <li><a class="dropdown-item" href="#">Alphabetical</a></li>
+                                <li><a class="dropdown-item" href="#">Recently Interacted</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        {% for i in range(1, 13) %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <img src="https://source.unsplash.com/random/100x100?person,{{ i + 50 }}" alt="Friend" class="rounded-circle me-3" width="80" height="80">
+                                        <div>
+                                            <h6 class="card-title mb-1">Friend {{ i }}</h6>
+                                            <p class="text-muted small mb-2">{{ i * 3 }} mutual friends</p>
+                                            <div class="d-flex">
+                                                <button class="btn btn-sm btn-primary me-2">
+                                                    <i class="fas fa-comment me-1"></i> Message
+                                                </button>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-h"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#">View Profile</a></li>
+                                                        <li><a class="dropdown-item" href="#">Add to Close Friends</a></li>
+                                                        <li><a class="dropdown-item" href="#">Unfollow</a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><a class="dropdown-item text-danger" href="#">Unfriend</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button class="btn btn-light">
+                            <i class="fas fa-spinner me-2"></i> Load More
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Friend Requests Tab -->
+            <div class="tab-pane fade" id="requests">
+                <div class="p-3">
+                    <h6 class="mb-3">Friend Requests</h6>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <img src="https://source.unsplash.com/random/100x100?person,101" alt="User" class="rounded-circle me-3" width="80" height="80">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Luffy Monkey</h6>
+                                    <p class="text-muted small mb-3">5 mutual friends</p>
+                                    <div class="d-flex">
+                                        <button class="btn btn-primary me-2">Confirm</button>
+                                        <button class="btn btn-light">Delete</button>
+                                    </div>
+                                </div>
+                                <div class="text-muted small">
+                                    2d
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <img src="https://source.unsplash.com/random/100x100?person,102" alt="User" class="rounded-circle me-3" width="80" height="80">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Zoro Roronoa</h6>
+                                    <p class="text-muted small mb-3">2 mutual friends</p>
+                                    <div class="d-flex">
+                                        <button class="btn btn-primary me-2">Confirm</button>
+                                        <button class="btn btn-light">Delete</button>
+                                    </div>
+                                </div>
+                                <div class="text-muted small">
+                                    5d
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <img src="https://source.unsplash.com/random/100x100?person,103" alt="User" class="rounded-circle me-3" width="80" height="80">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Nami Navigator</h6>
+                                    <p class="text-muted small mb-3">8 mutual friends</p>
+                                    <div class="d-flex">
+                                        <button class="btn btn-primary me-2">Confirm</button>
+                                        <button class="btn btn-light">Delete</button>
+                                    </div>
+                                </div>
+                                <div class="text-muted small">
+                                    1w
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mb-3 mt-4">Sent Requests</h6>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <img src="https://source.unsplash.com/random/100x100?person,104" alt="User" class="rounded-circle me-3" width="80" height="80">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Sanji Cook</h6>
+                                    <p class="text-muted small mb-3">3 mutual friends</p>
+                                    <button class="btn btn-light">Cancel Request</button>
+                                </div>
+                                <div class="text-muted small">
+                                    3d
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <img src="https://source.unsplash.com/random/100x100?person,105" alt="User" class="rounded-circle me-3" width="80" height="80">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Robin Archaeologist</h6>
+                                    <p class="text-muted small mb-3">1 mutual friend</p>
+                                    <button class="btn btn-light">Cancel Request</button>
+                                </div>
+                                <div class="text-muted small">
+                                    1w
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suggestions Tab -->
+            <div class="tab-pane fade" id="suggestions">
+                <div class="p-3">
+                    <h6 class="mb-3">People You May Know</h6>
+                    
+                    <div class="row g-3">
+                        {% for i in range(1, 9) %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <img src="https://source.unsplash.com/random/100x100?person,{{ i + 70 }}" alt="Suggestion" class="rounded-circle me-3" width="80" height="80">
+                                        <div>
+                                            <h6 class="card-title mb-1">Suggested Friend {{ i }}</h6>
+                                            <p class="text-muted small mb-2">{{ i }} mutual friends</p>
+                                            <div class="d-flex">
+                                                <button class="btn btn-sm btn-primary me-2">
+                                                    <i class="fas fa-user-plus me-1"></i> Add Friend
+                                                </button>
+                                                <button class="btn btn-sm btn-light">
+                                                    <i class="fas fa-times me-1"></i> Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button class="btn btn-light">
+                            <i class="fas fa-spinner me-2"></i> Load More
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

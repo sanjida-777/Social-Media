@@ -1,0 +1,430 @@
+{% extends "lite/base.html" %}
+
+{% block title %}{{ user.first_name }} {{ user.last_name }} - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="profile-cover">
+        {% if user.cover_image %}
+            <img src="{{ user.cover_image }}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;">
+        {% endif %}
+        <img src="{{ user.profile_image or '/static/img/default-avatar.png' }}" alt="Profile" class="profile-avatar">
+    </div>
+    <div class="profile-info">
+        <h1 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h1>
+        <p class="profile-bio">{{ user.bio or 'No bio yet.' }}</p>
+        
+        {% if current_user.id == user.id %}
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i> Add to Story
+                </button>
+                <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-light">
+                    <i class="fas fa-pen me-2"></i> Edit Profile
+                </a>
+            </div>
+        {% else %}
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                {% if user.is_friend_with(current_user) %}
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="friendshipDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-check me-2"></i> Friends
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="friendshipDropdown">
+                            <li><a class="dropdown-item" href="#">Add to Close Friends</a></li>
+                            <li><a class="dropdown-item" href="#">Unfollow</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#unfriendModal">
+                                    Unfriend
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="{{ url_for('messages.conversation', username=user.username) }}" class="btn btn-primary">
+                        <i class="fas fa-comment me-2"></i> Message
+                    </a>
+                {% elif user.has_friend_request_from(current_user) %}
+                    <form action="{{ url_for('friendship.cancel_request', username=user.username) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-light">
+                            <i class="fas fa-user-clock me-2"></i> Cancel Request
+                        </button>
+                    </form>
+                    <a href="{{ url_for('messages.conversation', username=user.username) }}" class="btn btn-primary">
+                        <i class="fas fa-comment me-2"></i> Message
+                    </a>
+                {% elif current_user.has_friend_request_from(user) %}
+                    <form action="{{ url_for('friendship.accept_request', username=user.username) }}" method="POST" class="me-2">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i> Accept
+                        </button>
+                    </form>
+                    <form action="{{ url_for('friendship.reject_request', username=user.username) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-light">
+                            <i class="fas fa-times me-2"></i> Delete
+                        </button>
+                    </form>
+                {% else %}
+                    <form action="{{ url_for('friendship.send_request', username=user.username) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i> Add Friend
+                        </button>
+                    </form>
+                    <a href="{{ url_for('messages.conversation', username=user.username) }}" class="btn btn-light">
+                        <i class="fas fa-comment me-2"></i> Message
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <div class="profile-stats">
+            <a href="{{ url_for('friendship.friends', user_id=user.id) }}" class="profile-stat text-decoration-none text-reset">
+                <div class="profile-stat-value">{{ user.friends.count() }}</div>
+                <div class="profile-stat-label">Friends</div>
+            </a>
+            <a href="{{ url_for('friendship.followers', user_id=user.id) }}" class="profile-stat text-decoration-none text-reset">
+                <div class="profile-stat-value">{{ user.followers.count() }}</div>
+                <div class="profile-stat-label">Followers</div>
+            </a>
+            <a href="{{ url_for('friendship.following', user_id=user.id) }}" class="profile-stat text-decoration-none text-reset">
+                <div class="profile-stat-value">{{ user.following.count() }}</div>
+                <div class="profile-stat-label">Following</div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <!-- About -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">About</h5>
+                {% if current_user.id == user.id %}
+                    <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-briefcase text-muted"></i>
+                        </div>
+                        <div>
+                            {% if user.work %}
+                                <p class="mb-0">Works at {{ user.work }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0">No workplace added</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-graduation-cap text-muted"></i>
+                        </div>
+                        <div>
+                            {% if user.education %}
+                                <p class="mb-0">Studied at {{ user.education }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0">No education added</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-home text-muted"></i>
+                        </div>
+                        <div>
+                            {% if user.location %}
+                                <p class="mb-0">Lives in {{ user.location }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0">No location added</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-heart text-muted"></i>
+                        </div>
+                        <div>
+                            {% if user.relationship_status %}
+                                <p class="mb-0">{{ user.relationship_status }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0">No relationship status added</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-clock text-muted"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0">Joined {{ user.created_at.strftime('%B %Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Photos -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Photos</h5>
+                <a href="#" class="text-primary">See All Photos</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    {% for post in posts.items if post.image %}
+                        <div class="col-4">
+                            <a href="{{ url_for('feed.view_post', post_id=post.id) }}">
+                                <img src="{{ post.image }}" alt="Photo" class="img-fluid rounded">
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="col-12 text-center py-3">
+                            <p class="text-muted mb-0">No photos to show</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Friends -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Friends</h5>
+                <a href="{{ url_for('friendship.friends', user_id=user.id) }}" class="text-primary">See All Friends</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    {% for friend in user.friends.limit(6).all() %}
+                        <div class="col-4">
+                            <div class="text-center">
+                                <a href="{{ url_for('profile.view', username=friend.username) }}" class="text-decoration-none">
+                                    <img src="{{ friend.profile_image or '/static/img/default-avatar.png' }}" alt="{{ friend.first_name }}" class="img-fluid rounded mb-2">
+                                    <div class="small">{{ friend.first_name }}</div>
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="col-12 text-center py-3">
+                            <p class="text-muted mb-0">No friends to show</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <!-- Create Post -->
+        {% if current_user.id == user.id %}
+        <div class="post-card mb-4">
+            <div class="p-3 d-flex align-items-center">
+                <img src="{{ current_user.profile_image or '/static/img/default-avatar.png' }}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
+                <a href="{{ url_for('feed.new_post') }}" class="form-control rounded-pill bg-light text-muted text-decoration-none d-flex align-items-center" style="height: 40px;">
+                    What's on your mind, {{ current_user.first_name }}?
+                </a>
+            </div>
+            <div class="border-top d-flex">
+                <a href="{{ url_for('feed.new_post') }}" class="btn flex-grow-1 text-danger py-2">
+                    <i class="fas fa-video me-2"></i> Live Video
+                </a>
+                <a href="{{ url_for('feed.new_post') }}" class="btn flex-grow-1 text-success py-2">
+                    <i class="fas fa-images me-2"></i> Photo/Video
+                </a>
+                <a href="{{ url_for('feed.new_post') }}" class="btn flex-grow-1 text-warning py-2">
+                    <i class="fas fa-smile me-2"></i> Feeling/Activity
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Posts -->
+        {% if posts.items %}
+            {% for post in posts.items %}
+                <div class="post-card mb-4">
+                    <div class="post-header">
+                        <img src="{{ post.author.profile_image or '/static/img/default-avatar.png' }}" alt="{{ post.author.first_name }}" class="post-avatar">
+                        <div>
+                            <div class="post-user">{{ post.author.first_name }} {{ post.author.last_name }}</div>
+                            <div class="post-time">{{ post.created_at|datetime }}</div>
+                        </div>
+                        {% if post.author_id == current_user.id %}
+                            <div class="dropdown ms-auto">
+                                <button class="btn btn-sm text-muted" type="button" id="postMenu{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="postMenu{{ post.id }}">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('feed.update_post', post_id=post.id) }}">
+                                            <i class="fas fa-edit me-2"></i> Edit Post
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deletePostModal{{ post.id }}">
+                                            <i class="fas fa-trash me-2"></i> Delete Post
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Delete Post Modal -->
+                            <div class="modal fade" id="deletePostModal{{ post.id }}" tabindex="-1" aria-labelledby="deletePostModalLabel{{ post.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deletePostModalLabel{{ post.id }}">Delete Post</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete this post?</p>
+                                            <p class="text-muted">This action cannot be undone.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form action="{{ url_for('feed.delete_post', post_id=post.id) }}" method="POST">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="post-content">
+                        <p>{{ post.content }}</p>
+                    </div>
+                    {% if post.image %}
+                        <img src="{{ post.image }}" alt="Post image" class="post-image">
+                    {% endif %}
+                    <div class="p-3 d-flex justify-content-between text-muted small">
+                        <div>
+                            <i class="fas fa-thumbs-up text-primary"></i>
+                            <span>{{ post.likes|length }}</span>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('feed.view_post', post_id=post.id) }}" class="text-muted text-decoration-none">
+                                {{ post.comments|length }} comments
+                            </a>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <div class="post-action {% if current_user in post.likes %}text-primary{% endif %}">
+                            <form action="{{ url_for('feed.like_post', post_id=post.id) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn p-0 {% if current_user in post.likes %}text-primary{% endif %}">
+                                    <i class="{% if current_user in post.likes %}fas{% else %}far{% endif %} fa-thumbs-up me-1"></i> Like
+                                </button>
+                            </form>
+                        </div>
+                        <a href="{{ url_for('feed.view_post', post_id=post.id) }}" class="post-action text-decoration-none text-reset">
+                            <i class="far fa-comment me-1"></i> Comment
+                        </a>
+                        <div class="post-action">
+                            <i class="far fa-share-square me-1"></i> Share
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            {% if posts.pages > 1 %}
+                <nav aria-label="Posts pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if posts.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('profile.view', username=user.username, page=posts.prev_num) }}">Previous</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                            {% if page_num %}
+                                {% if page_num == posts.page %}
+                                    <li class="page-item active" aria-current="page">
+                                        <a class="page-link" href="{{ url_for('profile.view', username=user.username, page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('profile.view', username=user.username, page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">...</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if posts.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('profile.view', username=user.username, page=posts.next_num) }}">Next</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="card mb-4">
+                <div class="card-body text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-newspaper fa-3x text-muted"></i>
+                    </div>
+                    <h5>No Posts Yet</h5>
+                    <p class="text-muted">When {{ user.first_name }} creates posts, they'll appear here.</p>
+                    {% if current_user.id == user.id %}
+                        <a href="{{ url_for('feed.new_post') }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-1"></i> Create Post
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Unfriend Modal -->
+<div class="modal fade" id="unfriendModal" tabindex="-1" aria-labelledby="unfriendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="unfriendModalLabel">Unfriend {{ user.first_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove {{ user.first_name }} {{ user.last_name }} as a friend?</p>
+                <p class="text-muted">{{ user.first_name }} will not be notified that you removed them as a friend.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('friendship.unfriend', username=user.username) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

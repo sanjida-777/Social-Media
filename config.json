@@ -1,6 +1,6 @@
 {
   "site": {
-    "name": "SocialLite",
+    "name": "Deshi Anime",
     "tagline": "A lightweight social experience",
     "description": "A responsive and lightweight social media platform similar to Facebook Lite",
     "version": "1.0.0",
@@ -9,15 +9,20 @@
       "favicon": "/static/img/favicon.ico",
       "touchIcon": "/static/img/touch-icon.png"
     },
-    "url": "https://sociallite.example.com",
+    "url": "https://example.com",
     "language": "en",
     "themeColor": "#1877f2"
   },
+
+  "DevMode": true,
+  "Log": true,
+
+
   "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com",
-    "website": "https://yourwebsite.com",
-    "github": "https://github.com/yourusername"
+    "name": "Team Grandpa",
+    "email": "example@example.com",
+    "website": "https://example.com",
+    "github": "https://github.com/Sanjida-777"
   },
   "app": {
     "defaultTheme": "dark",

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}405 - Method Not Allowed{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">
+            <i class="fas fa-ban"></i>
+        </div>
+        <div class="error-title">
+            <h1>405</h1>
+            <h2>Method Not Allowed</h2>
+        </div>
+        <div class="error-message">
+            <p>The method specified in the request is not allowed for the resource identified by the request URI.</p>
+        </div>
+        <div class="error-actions">
+            <div class="error-button">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    <span>Go to Homepage</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

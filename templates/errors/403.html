@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}403 - Forbidden{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">
+            <i class="fas fa-lock"></i>
+        </div>
+        <div class="error-title">
+            <h1>403</h1>
+            <h2>Forbidden</h2>
+        </div>
+        <div class="error-message">
+            <p>You don't have permission to access this resource.</p>
+        </div>
+        <div class="error-actions">
+            <div class="error-button">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-home"></i>
+                    <span>Go to Homepage</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

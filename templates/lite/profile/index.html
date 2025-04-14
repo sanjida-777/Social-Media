@@ -1,0 +1,390 @@
+{% extends "lite/base.html" %}
+
+{% block title %}{{ user.first_name }} {{ user.last_name }} - Deshi Anime{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="profile-cover">
+        {% if user.cover_image %}
+            <img src="{{ user.cover_image }}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;">
+        {% endif %}
+        <img src="{{ user.profile_image or '/static/img/default-avatar.png' }}" alt="Profile" class="profile-avatar">
+    </div>
+    <div class="profile-info">
+        <h1 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h1>
+        <p class="profile-bio">{{ user.bio or 'No bio yet.' }}</p>
+        
+        {% if current_user.id == user.id %}
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i> Add to Story
+                </button>
+                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    <i class="fas fa-pen me-2"></i> Edit Profile
+                </button>
+            </div>
+        {% else %}
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                {% if is_friend %}
+                    <button class="btn btn-light">
+                        <i class="fas fa-user-check me-2"></i> Friends
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-comment me-2"></i> Message
+                    </button>
+                {% elif friend_request_sent %}
+                    <button class="btn btn-light">
+                        <i class="fas fa-user-clock me-2"></i> Request Sent
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-comment me-2"></i> Message
+                    </button>
+                {% elif friend_request_received %}
+                    <button class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i> Confirm
+                    </button>
+                    <button class="btn btn-light">
+                        <i class="fas fa-times me-2"></i> Delete
+                    </button>
+                {% else %}
+                    <button class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i> Add Friend
+                    </button>
+                    <button class="btn btn-light">
+                        <i class="fas fa-comment me-2"></i> Message
+                    </button>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <div class="profile-stat-value">{{ friend_count }}</div>
+                <div class="profile-stat-label">Friends</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-value">{{ post_count }}</div>
+                <div class="profile-stat-label">Posts</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-value">{{ photo_count }}</div>
+                <div class="profile-stat-label">Photos</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <!-- About -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">About</h5>
+                {% if current_user.id == user.id %}
+                    <button class="btn btn-sm btn-light">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-briefcase text-muted"></i>
+                        </div>
+                        <div>
+                            {% if user.work %}
+                                <p class="mb-0">Works at {{ user.work }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0">No workplace added</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-graduation-cap text-muted"></i>
+                        </div>
+                        <div>
+                            {% if user.education %}
+                                <p class="mb-0">Studied at {{ user.education }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0">No education added</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-home text-muted"></i>
+                        </div>
+                        <div>
+                            {% if user.location %}
+                                <p class="mb-0">Lives in {{ user.location }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0">No location added</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-heart text-muted"></i>
+                        </div>
+                        <div>
+                            {% if user.relationship_status %}
+                                <p class="mb-0">{{ user.relationship_status }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0">No relationship status added</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div style="width: 24px; margin-right: 10px;">
+                            <i class="fas fa-clock text-muted"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0">Joined {{ user.created_at.strftime('%B %Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Photos -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Photos</h5>
+                <a href="#" class="text-primary">See All Photos</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    {% for i in range(1, 10) %}
+                    <div class="col-4">
+                        <img src="https://source.unsplash.com/random/300x300?anime,{{ i }}" alt="Photo" class="img-fluid rounded">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Friends -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Friends</h5>
+                <a href="#" class="text-primary">See All Friends</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    {% for i in range(1, 7) %}
+                    <div class="col-4">
+                        <div class="text-center">
+                            <img src="https://source.unsplash.com/random/100x100?person,{{ i + 30 }}" alt="Friend" class="img-fluid rounded mb-2">
+                            <div class="small">Friend {{ i }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <!-- Create Post -->
+        {% if current_user.id == user.id %}
+        <div class="post-card mb-4">
+            <div class="p-3 d-flex align-items-center">
+                <img src="{{ current_user.profile_image or '/static/img/default-avatar.png' }}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
+                <div class="form-control rounded-pill bg-light text-muted" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                    What's on your mind, {{ current_user.first_name }}?
+                </div>
+            </div>
+            <div class="border-top d-flex">
+                <button class="btn flex-grow-1 text-danger py-2">
+                    <i class="fas fa-video me-2"></i> Live Video
+                </button>
+                <button class="btn flex-grow-1 text-success py-2">
+                    <i class="fas fa-images me-2"></i> Photo/Video
+                </button>
+                <button class="btn flex-grow-1 text-warning py-2">
+                    <i class="fas fa-smile me-2"></i> Feeling/Activity
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Posts -->
+        {% for i in range(1, 4) %}
+        <div class="post-card mb-4">
+            <div class="post-header">
+                <img src="{{ user.profile_image or '/static/img/default-avatar.png' }}" alt="User" class="post-avatar">
+                <div>
+                    <div class="post-user">{{ user.first_name }} {{ user.last_name }}</div>
+                    <div class="post-time">{{ (now - i|int * 86400)|datetime }}</div>
+                </div>
+            </div>
+            <div class="post-content">
+                <p>{{ ["Just finished watching the latest episode of my favorite anime! The animation was incredible! 🔥", 
+                       "Found this amazing manga today. Can't wait to start reading it this weekend! 📚", 
+                       "Who else is excited for the upcoming anime convention? I'm already planning my cosplay! 🎭"][i-1] }}</p>
+            </div>
+            <img src="https://source.unsplash.com/random/800x450?anime,{{ i + 10 }}" alt="Post image" class="post-image">
+            <div class="post-actions">
+                <div class="post-action">
+                    <i class="far fa-thumbs-up"></i> Like
+                </div>
+                <div class="post-action">
+                    <i class="far fa-comment"></i> Comment
+                </div>
+                <div class="post-action">
+                    <i class="far fa-share-square"></i> Share
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Load More -->
+        <div class="text-center my-4">
+            <button class="btn btn-light">
+                <i class="fas fa-spinner me-2"></i> Load More
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('profile.update') }}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Profile Picture</label>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ user.profile_image or '/static/img/default-avatar.png' }}" alt="Profile" class="rounded-circle me-3" width="100" height="100">
+                            <div>
+                                <input type="file" class="form-control" name="profile_image" accept="image/*">
+                                <div class="form-text">Recommended size: 400x400 pixels</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Cover Photo</label>
+                        <div>
+                            <div class="mb-2" style="height: 150px; background-color: #f0f2f5; overflow: hidden;">
+                                {% if user.cover_image %}
+                                    <img src="{{ user.cover_image }}" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% endif %}
+                            </div>
+                            <input type="file" class="form-control" name="cover_image" accept="image/*">
+                            <div class="form-text">Recommended size: 820x312 pixels</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="3">{{ user.bio or '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="work" class="form-label">Work</label>
+                        <input type="text" class="form-control" id="work" name="work" value="{{ user.work or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="education" class="form-label">Education</label>
+                        <input type="text" class="form-control" id="education" name="education" value="{{ user.education or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ user.location or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="relationship_status" class="form-label">Relationship Status</label>
+                        <select class="form-select" id="relationship_status" name="relationship_status">
+                            <option value="" {% if not user.relationship_status %}selected{% endif %}>Select status</option>
+                            <option value="Single" {% if user.relationship_status == 'Single' %}selected{% endif %}>Single</option>
+                            <option value="In a relationship" {% if user.relationship_status == 'In a relationship' %}selected{% endif %}>In a relationship</option>
+                            <option value="Engaged" {% if user.relationship_status == 'Engaged' %}selected{% endif %}>Engaged</option>
+                            <option value="Married" {% if user.relationship_status == 'Married' %}selected{% endif %}>Married</option>
+                            <option value="It's complicated" {% if user.relationship_status == "It's complicated" %}selected{% endif %}>It's complicated</option>
+                        </select>
+                    </div>
+                    
+                    <div class="text-end">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Post Modal -->
+<div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createPostModalLabel">Create Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ current_user.profile_image or '/static/img/default-avatar.png' }}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
+                    <div>
+                        <div class="fw-bold">{{ current_user.first_name }} {{ current_user.last_name }}</div>
+                        <select class="form-select form-select-sm mt-1" style="width: auto;">
+                            <option>Public</option>
+                            <option>Friends</option>
+                            <option>Only me</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea class="form-control border-0" rows="5" placeholder="What's on your mind, {{ current_user.first_name }}?"></textarea>
+                <div class="border rounded p-3 mt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>Add to your post</div>
+                        <div>
+                            <button class="btn text-success"><i class="fas fa-images"></i></button>
+                            <button class="btn text-primary"><i class="fas fa-user-tag"></i></button>
+                            <button class="btn text-warning"><i class="fas fa-smile"></i></button>
+                            <button class="btn text-danger"><i class="fas fa-map-marker-alt"></i></button>
+                            <button class="btn text-info"><i class="fas fa-flag"></i></button>
+                            <button class="btn text-secondary"><i class="fas fa-ellipsis-h"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary w-100">Post</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

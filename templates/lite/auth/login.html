@@ -1,0 +1,48 @@
+{% extends "lite/base.html" %}
+
+{% block title %}Login - Deshi Anime{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-logo">
+        <h1 class="text-primary mb-0">Deshi Anime</h1>
+        <p class="text-muted">A lightweight social experience</p>
+    </div>
+    
+    <div class="auth-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+                <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="Email address" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn-facebook">Log In</button>
+            <div class="text-center my-3">
+                <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none">Forgot Password?</a>
+            </div>
+            <div class="auth-divider">
+                <span>or</span>
+            </div>
+            <a href="{{ url_for('auth.register') }}" class="btn-create-account">Create New Account</a>
+        </form>
+    </div>
+    
+    <div class="text-center mt-4">
+        <p class="small text-muted">
+            By logging in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        </p>
+    </div>
+</div>
+{% endblock %}
