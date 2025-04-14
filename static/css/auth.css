@@ -1,0 +1,39 @@
+/* Authentication CSS Styles */
+
+.card {
+    margin-top: 2rem;
+}
+
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styles */
+.form-control:focus {
+    border-color: #4267B2;
+    box-shadow: 0 0 0 0.25rem rgba(66, 103, 178, 0.25);
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #4267B2;
+    border-color: #4267B2;
+}
+
+.btn-primary:hover {
+    background-color: #365899;
+    border-color: #365899;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 1rem;
+    }
+}

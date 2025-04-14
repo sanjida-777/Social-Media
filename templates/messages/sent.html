@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Sent Messages{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Messages</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('messages.inbox') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-inbox me-2"></i> Inbox
+                </a>
+                <a href="{{ url_for('messages.sent') }}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-paper-plane me-2"></i> Sent
+                </a>
+                <a href="{{ url_for('messages.new_message') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-plus me-2"></i> New Message
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Sent Messages</h5>
+                <a href="{{ url_for('messages.new_message') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus me-1"></i> New Message
+                </a>
+            </div>
+            <div class="card-body">
+                {% if messages.items %}
+                <div class="list-group">
+                    {% for message in messages.items %}
+                    <a href="{{ url_for('messages.conversation', username=message.recipient.username) }}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='img/profile_pics/' + message.recipient.profile_image) }}" 
+                                     alt="Profile Picture" class="rounded-circle profile-pic-small me-3">
+                                <div>
+                                    <h6 class="mb-1">{{ message.recipient.first_name }} {{ message.recipient.last_name }}</h6>
+                                    <p class="mb-1 text-truncate message-preview">{{ message.content }}</p>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">{{ message.created_at.strftime('%b %d, %Y') }}</small>
+                                {% if message.read %}
+                                <span class="badge bg-success ms-2">Read</span>
+                                {% else %}
+                                <span class="badge bg-secondary ms-2">Unread</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if messages.pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if messages.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('messages.sent', page=messages.prev_num) }}">Previous</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in messages.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                            {% if page_num %}
+                                {% if messages.page == page_num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page_num }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('messages.sent', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if messages.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('messages.sent', page=messages.next_num) }}">Next</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-paper-plane fa-3x text-muted mb-3"></i>
+                    <p class="lead">You haven't sent any messages yet.</p>
+                    <a href="{{ url_for('messages.new_message') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> Send a Message
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+{% endblock %}

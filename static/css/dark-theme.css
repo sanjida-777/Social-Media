@@ -1,0 +1,128 @@
+/* Dark Theme CSS */
+
+/* Global Styles */
+body.dark-theme {
+    background-color: #18191a;
+    color: #e4e6eb;
+}
+
+/* Navbar Styles */
+body.dark-theme .navbar {
+    background-color: #242526 !important;
+}
+
+/* Card Styles */
+body.dark-theme .card {
+    background-color: #242526;
+    color: #e4e6eb;
+    border-color: #3a3b3c;
+}
+
+body.dark-theme .card-header {
+    background-color: #3a3b3c;
+    border-color: #3a3b3c;
+}
+
+/* Form Styles */
+body.dark-theme .form-control {
+    background-color: #3a3b3c;
+    border-color: #3a3b3c;
+    color: #e4e6eb;
+}
+
+body.dark-theme .form-control:focus {
+    background-color: #3a3b3c;
+    color: #e4e6eb;
+}
+
+/* Button Styles */
+body.dark-theme .btn-light {
+    background-color: #3a3b3c;
+    color: #e4e6eb;
+}
+
+body.dark-theme .btn-light:hover {
+    background-color: #4e4f50;
+}
+
+/* Dropdown Styles */
+body.dark-theme .dropdown-menu {
+    background-color: #242526;
+    border-color: #3a3b3c;
+}
+
+body.dark-theme .dropdown-item {
+    color: #e4e6eb;
+}
+
+body.dark-theme .dropdown-item:hover {
+    background-color: #3a3b3c;
+    color: #e4e6eb;
+}
+
+body.dark-theme .dropdown-divider {
+    border-color: #3a3b3c;
+}
+
+/* List Group Styles */
+body.dark-theme .list-group-item {
+    background-color: #242526;
+    border-color: #3a3b3c;
+    color: #e4e6eb;
+}
+
+body.dark-theme .list-group-item-action:hover {
+    background-color: #3a3b3c;
+}
+
+/* Comment Styles */
+body.dark-theme .comment-bubble {
+    background-color: #3a3b3c;
+}
+
+/* Footer Styles */
+body.dark-theme footer {
+    background-color: #242526 !important;
+    color: #b0b3b8;
+    border-color: #3a3b3c;
+}
+
+/* Alert Styles */
+body.dark-theme .alert {
+    background-color: #3a3b3c;
+    color: #e4e6eb;
+    border-color: #4e4f50;
+}
+
+/* Table Styles */
+body.dark-theme .table {
+    color: #e4e6eb;
+}
+
+body.dark-theme .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .table-hover > tbody > tr:hover {
+    background-color: rgba(255, 255, 255, 0.075);
+}
+
+/* Modal Styles */
+body.dark-theme .modal-content {
+    background-color: #242526;
+    border-color: #3a3b3c;
+}
+
+body.dark-theme .modal-header,
+body.dark-theme .modal-footer {
+    border-color: #3a3b3c;
+}
+
+/* Link Styles */
+body.dark-theme a {
+    color: #4599ff;
+}
+
+body.dark-theme a:hover {
+    color: #77b7ff;
+}

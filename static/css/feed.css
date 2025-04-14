@@ -1,0 +1,53 @@
+/* Feed CSS Styles */
+
+/* Post Card Styles */
+.post-card {
+    margin-bottom: 20px;
+    transition: transform 0.2s;
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Comment Styles */
+.comment-bubble {
+    background-color: #f0f2f5;
+    border-radius: 18px;
+    padding: 8px 12px;
+    max-width: calc(100% - 40px);
+}
+
+.comments-section {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Like Button Styles */
+.btn-light {
+    background-color: #f0f2f5;
+    border: none;
+    color: #65676b;
+    transition: background-color 0.2s;
+}
+
+.btn-light:hover {
+    background-color: #e4e6eb;
+}
+
+/* Sidebar Styles */
+.list-group-item.active {
+    background-color: #4267B2;
+    border-color: #4267B2;
+}
+
+.list-group-item-action:hover {
+    background-color: #f0f2f5;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .post-card {
+        margin-bottom: 15px;
+    }
+}

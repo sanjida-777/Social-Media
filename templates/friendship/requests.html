@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Friend Requests{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Friends</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('friendship.friend_requests') }}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-user-plus me-2"></i> Friend Requests
+                </a>
+                <a href="{{ url_for('friendship.friends', user_id=current_user.id) }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-users me-2"></i> My Friends
+                </a>
+                <a href="{{ url_for('friendship.followers', user_id=current_user.id) }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user-friends me-2"></i> My Followers
+                </a>
+                <a href="{{ url_for('friendship.following', user_id=current_user.id) }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user-check me-2"></i> Following
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Friend Requests</h5>
+            </div>
+            <div class="card-body">
+                {% if requests.items %}
+                <div class="list-group">
+                    {% for request in requests.items %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='img/profile_pics/' + request.sender.profile_image) }}" 
+                                     alt="Profile Picture" class="rounded-circle profile-pic-small me-3">
+                                <div>
+                                    <h6 class="mb-1">{{ request.sender.first_name }} {{ request.sender.last_name }}</h6>
+                                    <small class="text-muted">@{{ request.sender.username }}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <form action="{{ url_for('friendship.accept_request', username=request.sender.username) }}" method="POST" class="me-2">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check me-1"></i> Accept
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('friendship.reject_request', username=request.sender.username) }}" method="POST">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-times me-1"></i> Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if requests.pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if requests.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('friendship.friend_requests', page=requests.prev_num) }}">Previous</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in requests.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                            {% if page_num %}
+                                {% if requests.page == page_num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page_num }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('friendship.friend_requests', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if requests.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('friendship.friend_requests', page=requests.next_num) }}">Next</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-user-plus fa-3x text-muted mb-3"></i>
+                    <p class="lead">You don't have any friend requests.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

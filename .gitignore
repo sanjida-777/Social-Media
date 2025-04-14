@@ -1,0 +1,32 @@
+venv/
+venv
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Flask session files
+*.flask_session
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+
+# IDE and editor files
+.idea/
+.vscode/
+*.vscode
+*.pydevproject
+*.project
+*.pydevproject
