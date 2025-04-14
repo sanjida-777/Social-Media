@@ -211,6 +211,24 @@
     opacity: 0.7;
 }
 
+/* Offline and Pending Message Styles */
+.message-offline .message-content {
+    opacity: 0.7;
+    background-color: rgba(0, 132, 255, 0.5);
+}
+
+.message-pending .message-content {
+    opacity: 0.8;
+    background-color: rgba(0, 132, 255, 0.3);
+    animation: pulse-pending 2s infinite;
+}
+
+@keyframes pulse-pending {
+    0% { opacity: 0.6; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.6; }
+}
+
 /* New Message Notification */
 .new-message-notification {
     position: absolute;

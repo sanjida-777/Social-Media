@@ -1,0 +1,385 @@
+{% extends "lite/layout.html" %}
+
+{% block title %}SocialLite - Home{% endblock %}
+
+{% block content %}
+    <!-- Stories Section -->
+    <section class="stories-container">
+        <!-- Create Story -->
+        <div class="story-item">
+            <div class="story-avatar create-story">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="story-username">Create Story</div>
+        </div>
+        
+        <!-- User Stories -->
+        <div class="story-item">
+            <div class="story-avatar has-story">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            </div>
+            <div class="story-username">John Doe</div>
+        </div>
+        
+        <div class="story-item">
+            <div class="story-avatar has-story">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            </div>
+            <div class="story-username">Jane Smith</div>
+        </div>
+        
+        <div class="story-item">
+            <div class="story-avatar has-story">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            </div>
+            <div class="story-username">Mike Johnson</div>
+        </div>
+        
+        <div class="story-item">
+            <div class="story-avatar">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            </div>
+            <div class="story-username">Sarah Williams</div>
+        </div>
+        
+        <div class="story-item">
+            <div class="story-avatar">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            </div>
+            <div class="story-username">David Brown</div>
+        </div>
+    </section>
+
+    <!-- Create Post -->
+    <div class="post">
+        <div class="post-header">
+            <div class="post-avatar">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="Your profile picture">
+            </div>
+            <div class="post-info" style="display: flex; align-items: center; width: 100%;">
+                <input type="text" placeholder="What's on your mind?" style="background-color: var(--bg-tertiary); border: none; border-radius: 20px; padding: var(--spacing-sm) var(--spacing-md); width: 100%; color: var(--text-primary);">
+            </div>
+        </div>
+        <div class="post-actions" style="border-top: 1px solid var(--divider-color);">
+            <button class="post-action">
+                <i class="fas fa-image"></i> Photo
+            </button>
+            <button class="post-action">
+                <i class="fas fa-video"></i> Video
+            </button>
+            <button class="post-action">
+                <i class="fas fa-smile"></i> Feeling
+            </button>
+        </div>
+    </div>
+
+    <!-- News Feed -->
+    <div class="feed-container">
+        <!-- Post 1 -->
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">
+                    <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+                </div>
+                <div class="post-info">
+                    <div class="post-author">John Doe</div>
+                    <div class="post-time">2 hours ago</div>
+                </div>
+            </div>
+            <div class="post-content">
+                <div class="post-text">
+                    Just finished my morning run! 🏃‍♂️ Beautiful day outside.
+                </div>
+                <div class="post-media">
+                    <img src="https://source.unsplash.com/random/600x400/?running" alt="Post image" loading="lazy">
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="post-action">
+                    <i class="fas fa-thumbs-up"></i> 24
+                </button>
+                <button class="post-action">
+                    <i class="fas fa-comment"></i> 5
+                </button>
+                <button class="post-action">
+                    <i class="fas fa-share"></i> Share
+                </button>
+            </div>
+            <div class="post-comments">
+                <div class="comment">
+                    <div class="comment-avatar">
+                        <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+                    </div>
+                    <div class="comment-bubble">
+                        <div class="comment-author">Jane Smith</div>
+                        <div class="comment-text">Looks amazing! How far did you run?</div>
+                    </div>
+                </div>
+                <div class="comment-input">
+                    <input type="text" placeholder="Write a comment...">
+                    <button><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post 2 -->
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">
+                    <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+                </div>
+                <div class="post-info">
+                    <div class="post-author">Jane Smith</div>
+                    <div class="post-time">Yesterday</div>
+                </div>
+            </div>
+            <div class="post-content">
+                <div class="post-text">
+                    Just got my new book! Can't wait to start reading it this weekend. Any other fantasy fans here?
+                </div>
+                <div class="post-media">
+                    <img src="https://source.unsplash.com/random/600x400/?book" alt="Post image" loading="lazy">
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="post-action">
+                    <i class="fas fa-thumbs-up"></i> 42
+                </button>
+                <button class="post-action">
+                    <i class="fas fa-comment"></i> 8
+                </button>
+                <button class="post-action">
+                    <i class="fas fa-share"></i> Share
+                </button>
+            </div>
+            <div class="post-comments">
+                <div class="comment">
+                    <div class="comment-avatar">
+                        <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+                    </div>
+                    <div class="comment-bubble">
+                        <div class="comment-author">Mike Johnson</div>
+                        <div class="comment-text">I read that last month! You're going to love it!</div>
+                    </div>
+                </div>
+                <div class="comment-input">
+                    <input type="text" placeholder="Write a comment...">
+                    <button><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post 3 (Text only) -->
+        <div class="post">
+            <div class="post-header">
+                <div class="post-avatar">
+                    <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+                </div>
+                <div class="post-info">
+                    <div class="post-author">Mike Johnson</div>
+                    <div class="post-time">2 days ago</div>
+                </div>
+            </div>
+            <div class="post-content">
+                <div class="post-text">
+                    Just landed my dream job! So excited to start this new chapter in my life. Thanks to everyone who supported me along the way! 🎉
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="post-action">
+                    <i class="fas fa-thumbs-up"></i> 156
+                </button>
+                <button class="post-action">
+                    <i class="fas fa-comment"></i> 32
+                </button>
+                <button class="post-action">
+                    <i class="fas fa-share"></i> Share
+                </button>
+            </div>
+            <div class="post-comments">
+                <div class="comment">
+                    <div class="comment-avatar">
+                        <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+                    </div>
+                    <div class="comment-bubble">
+                        <div class="comment-author">Sarah Williams</div>
+                        <div class="comment-text">Congratulations! So happy for you!</div>
+                    </div>
+                </div>
+                <div class="comment-input">
+                    <input type="text" placeholder="Write a comment...">
+                    <button><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div class="post skeleton">
+            <div class="post-header">
+                <div class="post-avatar skeleton"></div>
+                <div class="post-info" style="width: 70%;">
+                    <div style="height: 16px; width: 60%; margin-bottom: 4px;" class="skeleton"></div>
+                    <div style="height: 12px; width: 40%;" class="skeleton"></div>
+                </div>
+            </div>
+            <div class="post-content">
+                <div style="height: 16px; width: 100%; margin-bottom: 8px;" class="skeleton"></div>
+                <div style="height: 16px; width: 90%; margin-bottom: 8px;" class="skeleton"></div>
+                <div style="height: 16px; width: 80%; margin-bottom: 16px;" class="skeleton"></div>
+                <div style="height: 200px; width: 100%;" class="skeleton"></div>
+            </div>
+            <div class="post-actions">
+                <div style="height: 20px; width: 30%;" class="skeleton"></div>
+                <div style="height: 20px; width: 30%;" class="skeleton"></div>
+                <div style="height: 20px; width: 30%;" class="skeleton"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Lazy loading for images
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if data saver is enabled
+        const dataSaver = localStorage.getItem('dataSaver') === 'true';
+        
+        if (dataSaver) {
+            // If data saver is enabled, load lower quality images
+            const images = document.querySelectorAll('.post-media img');
+            images.forEach(img => {
+                const src = img.src;
+                if (src.includes('unsplash')) {
+                    // Modify the URL to request a smaller image
+                    img.src = src.replace('600x400', '300x200');
+                }
+            });
+        }
+        
+        // Simulate loading more posts when scrolling to bottom
+        window.addEventListener('scroll', function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                // Remove skeleton loader after "loading" new content
+                const skeletonLoader = document.querySelector('.post.skeleton');
+                if (skeletonLoader) {
+                    setTimeout(() => {
+                        skeletonLoader.remove();
+                        loadMorePosts();
+                    }, 1000);
+                }
+            }
+        });
+    });
+    
+    // Function to simulate loading more posts
+    function loadMorePosts() {
+        const feedContainer = document.querySelector('.feed-container');
+        
+        // Create a new post element
+        const newPost = document.createElement('div');
+        newPost.className = 'post fade-in';
+        
+        // Random content for the new post
+        const randomContent = [
+            {
+                author: 'Sarah Williams',
+                time: '3 days ago',
+                text: 'Just visited this amazing restaurant downtown! The food was incredible. 🍽️',
+                image: 'https://source.unsplash.com/random/600x400/?food',
+                likes: Math.floor(Math.random() * 100),
+                comments: Math.floor(Math.random() * 20)
+            },
+            {
+                author: 'David Brown',
+                time: '4 days ago',
+                text: 'Beautiful sunset at the beach today. Nature is amazing!',
+                image: 'https://source.unsplash.com/random/600x400/?sunset',
+                likes: Math.floor(Math.random() * 100),
+                comments: Math.floor(Math.random() * 20)
+            },
+            {
+                author: 'Emily Wilson',
+                time: '5 days ago',
+                text: 'Just adopted this little guy from the shelter. Meet Max! 🐶',
+                image: 'https://source.unsplash.com/random/600x400/?puppy',
+                likes: Math.floor(Math.random() * 100),
+                comments: Math.floor(Math.random() * 20)
+            }
+        ];
+        
+        const randomPost = randomContent[Math.floor(Math.random() * randomContent.length)];
+        
+        // Check if data saver is enabled
+        const dataSaver = localStorage.getItem('dataSaver') === 'true';
+        const imageUrl = dataSaver ? randomPost.image.replace('600x400', '300x200') : randomPost.image;
+        
+        // Set the HTML content for the new post
+        newPost.innerHTML = `
+            <div class="post-header">
+                <div class="post-avatar">
+                    <img src="${ url_for('static', filename='img/profile_pics/default.jpg') }" alt="User avatar">
+                </div>
+                <div class="post-info">
+                    <div class="post-author">${randomPost.author}</div>
+                    <div class="post-time">${randomPost.time}</div>
+                </div>
+            </div>
+            <div class="post-content">
+                <div class="post-text">
+                    ${randomPost.text}
+                </div>
+                <div class="post-media">
+                    <img src="${imageUrl}" alt="Post image" loading="lazy">
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="post-action">
+                    <i class="fas fa-thumbs-up"></i> ${randomPost.likes}
+                </button>
+                <button class="post-action">
+                    <i class="fas fa-comment"></i> ${randomPost.comments}
+                </button>
+                <button class="post-action">
+                    <i class="fas fa-share"></i> Share
+                </button>
+            </div>
+            <div class="post-comments">
+                <div class="comment-input">
+                    <input type="text" placeholder="Write a comment...">
+                    <button><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        `;
+        
+        // Add the new post to the feed
+        feedContainer.appendChild(newPost);
+        
+        // Add a new skeleton loader
+        const skeletonLoader = document.createElement('div');
+        skeletonLoader.className = 'post skeleton';
+        skeletonLoader.innerHTML = `
+            <div class="post-header">
+                <div class="post-avatar skeleton"></div>
+                <div class="post-info" style="width: 70%;">
+                    <div style="height: 16px; width: 60%; margin-bottom: 4px;" class="skeleton"></div>
+                    <div style="height: 12px; width: 40%;" class="skeleton"></div>
+                </div>
+            </div>
+            <div class="post-content">
+                <div style="height: 16px; width: 100%; margin-bottom: 8px;" class="skeleton"></div>
+                <div style="height: 16px; width: 90%; margin-bottom: 8px;" class="skeleton"></div>
+                <div style="height: 16px; width: 80%; margin-bottom: 16px;" class="skeleton"></div>
+                <div style="height: 200px; width: 100%;" class="skeleton"></div>
+            </div>
+            <div class="post-actions">
+                <div style="height: 20px; width: 30%;" class="skeleton"></div>
+                <div style="height: 20px; width: 30%;" class="skeleton"></div>
+                <div style="height: 20px; width: 30%;" class="skeleton"></div>
+            </div>
+        `;
+        
+        // Add the skeleton loader to the feed
+        feedContainer.appendChild(skeletonLoader);
+    }
+</script>
+{% endblock %}

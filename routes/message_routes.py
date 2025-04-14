@@ -2,8 +2,10 @@ import uuid
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, HiddenField
+from wtforms import StringField, TextAreaField, SubmitField, HiddenField, FileField
 from wtforms.validators import DataRequired, Length
+from flask_wtf.file import FileAllowed
+from datetime import datetime, timezone
 from handlers.message_handler import (
     get_received_messages, get_sent_messages, get_conversation,
     send_message_handler, delete_message_handler, edit_message_handler,
@@ -18,6 +20,7 @@ class MessageForm(FlaskForm):
     recipient = StringField('Recipient', validators=[DataRequired()])
     content = TextAreaField('Message', validators=[DataRequired(), Length(min=1, max=500)])
     client_message_id = HiddenField()
+    attachment = FileField('Attachment', validators=[FileAllowed(['jpg', 'png', 'gif', 'pdf', 'doc', 'docx'])])
     submit = SubmitField('Send')
 
 class EditMessageForm(FlaskForm):
@@ -46,6 +49,21 @@ def conversation(username):
     messages, user = get_conversation(username, page=page)
     form = MessageForm()
     form.recipient.data = username  # Pre-populate recipient field
+
+    # Update user's last seen time
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now(timezone.utc)
+        from utils.db_utils import commit_to_db
+        commit_to_db()
+
+    # Mark all messages from this user as read
+    for message in messages.items:
+        if message.sender_id == user.id and not message.read:
+            message.read = True
+            message.read_at = datetime.now(timezone.utc)
+            from utils.db_utils import commit_to_db
+            commit_to_db()
+
     return render_template('messages/conversation.html', title=f'Conversation with {username}',
                           messages=messages, user=user, form=form, uuid4=uuid.uuid4)
 
@@ -63,7 +81,50 @@ def new_message():
 @messages.route('/message/<int:message_id>/delete', methods=['POST'])
 @login_required
 def delete_message(message_id):
-    return delete_message_handler(message_id)
+    # Check if this is a hard delete (completely remove content)
+    hard_delete = request.form.get('hard_delete') == 'true'
+    return delete_message_handler(message_id, hard_delete=hard_delete)
+
+@messages.route('/conversation/<string:username>/delete', methods=['POST'])
+@login_required
+def delete_conversation(username):
+    from models.user import User
+    from models.message import Message
+    from utils.db_utils import commit_to_db
+    from flask import flash, redirect, url_for, request
+
+    # Find the user
+    user = User.query.filter_by(username=username).first_or_404()
+
+    # Check if this is a hard delete (completely remove content)
+    hard_delete = request.form.get('hard_delete') == 'true'
+
+    # Get all messages between current user and the specified user
+    messages = Message.query.filter(
+        ((Message.sender_id == current_user.id) & (Message.recipient_id == user.id)) |
+        ((Message.sender_id == user.id) & (Message.recipient_id == current_user.id))
+    ).all()
+
+    if hard_delete:
+        # Hard delete - completely remove all message content and attachments
+        for message in messages:
+            # Only hard delete messages sent by current user
+            if message.sender_id == current_user.id:
+                message.mark_as_deleted(hard_delete=True)
+            else:
+                # For received messages, just mark as deleted
+                message.mark_as_deleted(hard_delete=False)
+
+        flash('Conversation permanently deleted with no trace.', 'success')
+    else:
+        # Soft delete - just mark all messages as deleted
+        for message in messages:
+            message.mark_as_deleted(hard_delete=False)
+
+        flash('Conversation deleted successfully.', 'success')
+
+    commit_to_db()
+    return redirect(url_for('messages.inbox'))
 
 @messages.route('/message/<int:message_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -130,12 +191,27 @@ def api_search_users():
 @messages.route('/api/messages/<string:username>', methods=['POST'])
 @login_required
 def api_send_message(username):
-    data = request.json
-    if not data or 'content' not in data:
-        return jsonify({'error': 'Content is required'}), 400
+    # Check if the request has form data (multipart/form-data for file uploads)
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        # Handle form data with possible file attachment
+        content = request.form.get('content', '')
+        client_message_id = request.form.get('client_message_id')
+        attachment = request.files.get('attachment')
 
-    client_message_id = data.get('client_message_id')
-    message, status_code = send_message_api(username, data['content'], client_message_id)
+        # Send message with attachment
+        message, status_code = send_message_api(username, content, client_message_id, attachment)
+    else:
+        # Handle JSON data (no attachment)
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Invalid request data'}), 400
+
+        content = data.get('content', '')
+        client_message_id = data.get('client_message_id')
+
+        # Send message without attachment
+        message, status_code = send_message_api(username, content, client_message_id)
+
     return jsonify(message), status_code
 
 @messages.route('/api/messages/<int:message_id>/status', methods=['PUT'])

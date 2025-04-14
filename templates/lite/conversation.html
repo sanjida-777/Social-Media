@@ -1,0 +1,282 @@
+{% extends "lite/layout.html" %}
+
+{% block title %}SocialLite - Chat with {{ username }}{% endblock %}
+
+{% block content %}
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <a href="{{ url_for('messages.inbox') }}" class="chat-header-back">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="conversation-avatar" style="width: 40px; height: 40px; margin-right: var(--spacing-md);">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+                <div class="online-indicator"></div>
+            </div>
+            <div class="chat-header-info">
+                <div class="chat-header-name">{{ username }}</div>
+                <div class="chat-header-status">Online</div>
+            </div>
+            <div class="chat-header-actions">
+                <button class="navbar-action" aria-label="Call">
+                    <i class="fas fa-phone"></i>
+                </button>
+                <button class="navbar-action" aria-label="Video call">
+                    <i class="fas fa-video"></i>
+                </button>
+                <button class="navbar-action" aria-label="Info">
+                    <i class="fas fa-info-circle"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chat-messages">
+            <!-- Date Separator -->
+            <div style="text-align: center; margin: var(--spacing-md) 0;">
+                <span style="background-color: var(--bg-tertiary); padding: var(--spacing-xs) var(--spacing-md); border-radius: 16px; font-size: var(--font-xs); color: var(--text-secondary);">Today</span>
+            </div>
+            
+            <!-- Received Message -->
+            <div class="message received">
+                <div class="message-bubble">
+                    Hey, how's it going?
+                </div>
+            </div>
+            
+            <!-- Sent Message -->
+            <div class="message sent">
+                <div class="message-bubble">
+                    Not bad! Just working on a new project. How about you?
+                </div>
+            </div>
+            
+            <!-- Received Message with Time -->
+            <div class="message received">
+                <div class="message-bubble">
+                    I'm good! Just got back from vacation. It was amazing!
+                </div>
+            </div>
+            <div style="font-size: var(--font-xs); color: var(--text-secondary); margin: 4px 0 var(--spacing-md) 50px;">10:15 AM</div>
+            
+            <!-- Sent Message with Image -->
+            <div class="message sent">
+                <div class="message-bubble">
+                    That's great! Where did you go?
+                </div>
+            </div>
+            
+            <!-- Received Message with Image -->
+            <div class="message received">
+                <div class="message-bubble">
+                    Went to the beach! Check out this photo:
+                </div>
+            </div>
+            <div class="message received">
+                <div class="message-bubble" style="padding: 0; overflow: hidden;">
+                    <img src="https://source.unsplash.com/random/300x200/?beach" alt="Beach photo" style="width: 100%; display: block;">
+                </div>
+            </div>
+            
+            <!-- Sent Message with Status -->
+            <div class="message sent">
+                <div class="message-bubble">
+                    Wow, that looks amazing! I need a vacation too.
+                </div>
+                <div class="message-status">
+                    <i class="fas fa-check-double"></i> Seen
+                </div>
+            </div>
+            
+            <!-- Typing Indicator -->
+            <div class="message received">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Input -->
+        <div class="chat-input">
+            <div class="chat-input-actions">
+                <button class="chat-input-action" aria-label="Attach file">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <button class="chat-input-action" aria-label="Send photo">
+                    <i class="fas fa-camera"></i>
+                </button>
+            </div>
+            <input type="text" class="chat-input-field" placeholder="Message..." id="message-input">
+            <button class="chat-input-send" aria-label="Send message" id="send-button">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        
+        // Scroll to bottom of chat
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Send message function
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (!messageText) return;
+            
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message sent';
+            
+            const messageBubble = document.createElement('div');
+            messageBubble.className = 'message-bubble';
+            messageBubble.textContent = messageText;
+            
+            const messageStatus = document.createElement('div');
+            messageStatus.className = 'message-status';
+            messageStatus.innerHTML = '<i class="fas fa-check"></i> Sent';
+            
+            messageDiv.appendChild(messageBubble);
+            messageDiv.appendChild(messageStatus);
+            
+            // Add message to chat
+            chatMessages.appendChild(messageDiv);
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Simulate received message after a delay
+            setTimeout(() => {
+                // Remove typing indicator
+                const typingIndicator = document.querySelector('.typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.parentElement.remove();
+                }
+                
+                // Update sent message status
+                messageStatus.innerHTML = '<i class="fas fa-check-double"></i> Seen';
+                
+                // Create response message
+                const responses = [
+                    "That's great!",
+                    "I agree!",
+                    "Interesting point.",
+                    "Let me think about that.",
+                    "Sounds good to me!",
+                    "Haha, that's funny!",
+                    "I see what you mean.",
+                    "Thanks for sharing that.",
+                    "I didn't know that!",
+                    "Tell me more about it."
+                ];
+                
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                const responseDiv = document.createElement('div');
+                responseDiv.className = 'message received';
+                
+                const responseBubble = document.createElement('div');
+                responseBubble.className = 'message-bubble';
+                responseBubble.textContent = randomResponse;
+                
+                responseDiv.appendChild(responseBubble);
+                
+                // Add response to chat
+                chatMessages.appendChild(responseDiv);
+                
+                // Add time to the last message
+                const timeDiv = document.createElement('div');
+                timeDiv.style.fontSize = 'var(--font-xs)';
+                timeDiv.style.color = 'var(--text-secondary)';
+                timeDiv.style.margin = '4px 0 var(--spacing-md) 50px';
+                
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const formattedHours = hours % 12 || 12;
+                const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+                
+                timeDiv.textContent = `${formattedHours}:${formattedMinutes} ${ampm}`;
+                
+                chatMessages.appendChild(timeDiv);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1500);
+            
+            // Show typing indicator immediately
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message received';
+            
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+            
+            typingDiv.appendChild(typingIndicator);
+            
+            // Add typing indicator to chat
+            chatMessages.appendChild(typingDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Send message on button click
+        sendButton.addEventListener('click', sendMessage);
+        
+        // Send message on Enter key
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Simulate typing indicator when focusing on input
+        messageInput.addEventListener('focus', function() {
+            // If there's no typing indicator already
+            if (!document.querySelector('.typing-indicator')) {
+                setTimeout(() => {
+                    // Only add if input is still focused
+                    if (document.activeElement === messageInput) {
+                        const typingDiv = document.createElement('div');
+                        typingDiv.className = 'message received';
+                        
+                        const typingIndicator = document.createElement('div');
+                        typingIndicator.className = 'typing-indicator';
+                        typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+                        
+                        typingDiv.appendChild(typingIndicator);
+                        
+                        // Add typing indicator to chat
+                        chatMessages.appendChild(typingDiv);
+                        
+                        // Scroll to bottom
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }, 1000);
+            }
+        });
+        
+        // Remove typing indicator when blurring input
+        messageInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                const typingIndicator = document.querySelector('.typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.parentElement.remove();
+                }
+            }, 1000);
+        });
+    });
+</script>
+{% endblock %}

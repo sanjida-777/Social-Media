@@ -1,0 +1,292 @@
+{% extends "lite/layout.html" %}
+
+{% block title %}SocialLite - Stories{% endblock %}
+
+{% block content %}
+    <!-- Stories Grid -->
+    <div style="padding: var(--spacing-md) 0;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md);">
+            <!-- Create Story -->
+            <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 9/16; background-color: var(--bg-secondary);">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-tertiary);">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background-color: var(--bg-secondary); display: flex; justify-content: center; align-items: center; margin-bottom: var(--spacing-md);">
+                        <i class="fas fa-plus" style="font-size: 24px; color: var(--accent-color);"></i>
+                    </div>
+                    <div style="font-weight: 600; text-align: center;">Create Story</div>
+                </div>
+            </div>
+            
+            <!-- User Story 1 -->
+            <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 9/16; background-color: var(--bg-secondary);">
+                <img src="https://source.unsplash.com/random/300x600/?portrait" alt="Story" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.7) 100%);">
+                    <div style="position: absolute; top: var(--spacing-md); left: var(--spacing-md);">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--accent-color); overflow: hidden;">
+                            <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+                    <div style="position: absolute; bottom: var(--spacing-md); left: var(--spacing-md); color: white;">
+                        <div style="font-weight: 600;">John Doe</div>
+                        <div style="font-size: var(--font-xs);">2 hours ago</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Story 2 -->
+            <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 9/16; background-color: var(--bg-secondary);">
+                <img src="https://source.unsplash.com/random/300x600/?travel" alt="Story" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.7) 100%);">
+                    <div style="position: absolute; top: var(--spacing-md); left: var(--spacing-md);">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--accent-color); overflow: hidden;">
+                            <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+                    <div style="position: absolute; bottom: var(--spacing-md); left: var(--spacing-md); color: white;">
+                        <div style="font-weight: 600;">Jane Smith</div>
+                        <div style="font-size: var(--font-xs);">5 hours ago</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Story 3 -->
+            <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 9/16; background-color: var(--bg-secondary);">
+                <img src="https://source.unsplash.com/random/300x600/?nature" alt="Story" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.7) 100%);">
+                    <div style="position: absolute; top: var(--spacing-md); left: var(--spacing-md);">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--accent-color); overflow: hidden;">
+                            <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+                    <div style="position: absolute; bottom: var(--spacing-md); left: var(--spacing-md); color: white;">
+                        <div style="font-weight: 600;">Mike Johnson</div>
+                        <div style="font-size: var(--font-xs);">Yesterday</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Story 4 -->
+            <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 9/16; background-color: var(--bg-secondary);">
+                <img src="https://source.unsplash.com/random/300x600/?city" alt="Story" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.7) 100%);">
+                    <div style="position: absolute; top: var(--spacing-md); left: var(--spacing-md);">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--accent-color); overflow: hidden;">
+                            <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+                    <div style="position: absolute; bottom: var(--spacing-md); left: var(--spacing-md); color: white;">
+                        <div style="font-weight: 600;">Sarah Williams</div>
+                        <div style="font-size: var(--font-xs);">Yesterday</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Story 5 -->
+            <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 9/16; background-color: var(--bg-secondary);">
+                <img src="https://source.unsplash.com/random/300x600/?food" alt="Story" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.7) 100%);">
+                    <div style="position: absolute; top: var(--spacing-md); left: var(--spacing-md);">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--accent-color); overflow: hidden;">
+                            <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+                    <div style="position: absolute; bottom: var(--spacing-md); left: var(--spacing-md); color: white;">
+                        <div style="font-weight: 600;">David Brown</div>
+                        <div style="font-size: var(--font-xs);">2 days ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Story Viewer (Hidden by default) -->
+    <div id="story-viewer" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: black; z-index: 2000;">
+        <!-- Story Header -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; padding: var(--spacing-md); display: flex; align-items: center; z-index: 2001;">
+            <button id="close-story" style="color: white; margin-right: var(--spacing-md);"><i class="fas fa-times"></i></button>
+            <div style="display: flex; align-items: center;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; margin-right: var(--spacing-md);">
+                    <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar" id="story-avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div>
+                    <div style="color: white; font-weight: 600;" id="story-username">Username</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: var(--font-xs);" id="story-time">Time</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Story Progress Bar -->
+        <div style="position: absolute; top: var(--spacing-lg); left: 0; right: 0; padding: 0 var(--spacing-md); display: flex; z-index: 2001;">
+            <div style="flex: 1; height: 3px; background-color: rgba(255,255,255,0.3); margin-right: 4px; border-radius: 3px; overflow: hidden;">
+                <div id="story-progress" style="height: 100%; width: 0; background-color: white; transition: width 0.1s linear;"></div>
+            </div>
+        </div>
+        
+        <!-- Story Content -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;">
+            <img id="story-image" src="" alt="Story" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+        </div>
+        
+        <!-- Story Navigation -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex;">
+            <div id="prev-story" style="flex: 1; cursor: pointer;"></div>
+            <div id="next-story" style="flex: 1; cursor: pointer;"></div>
+        </div>
+        
+        <!-- Story Reply -->
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: var(--spacing-md); display: flex; align-items: center; z-index: 2001;">
+            <input type="text" placeholder="Reply to story..." style="flex: 1; background-color: rgba(255,255,255,0.1); border: none; border-radius: 20px; padding: var(--spacing-sm) var(--spacing-md); color: white;">
+            <button style="margin-left: var(--spacing-md); color: white;"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Story viewer functionality
+        const storyItems = document.querySelectorAll('.grid-item');
+        const storyViewer = document.getElementById('story-viewer');
+        const closeStory = document.getElementById('close-story');
+        const storyImage = document.getElementById('story-image');
+        const storyUsername = document.getElementById('story-username');
+        const storyTime = document.getElementById('story-time');
+        const storyAvatar = document.getElementById('story-avatar');
+        const storyProgress = document.getElementById('story-progress');
+        const prevStory = document.getElementById('prev-story');
+        const nextStory = document.getElementById('next-story');
+        
+        // Sample story data
+        const stories = [
+            {
+                username: 'John Doe',
+                time: '2 hours ago',
+                image: 'https://source.unsplash.com/random/300x600/?portrait',
+                avatar: '{{ url_for("static", filename="img/profile_pics/default.jpg") }}'
+            },
+            {
+                username: 'Jane Smith',
+                time: '5 hours ago',
+                image: 'https://source.unsplash.com/random/300x600/?travel',
+                avatar: '{{ url_for("static", filename="img/profile_pics/default.jpg") }}'
+            },
+            {
+                username: 'Mike Johnson',
+                time: 'Yesterday',
+                image: 'https://source.unsplash.com/random/300x600/?nature',
+                avatar: '{{ url_for("static", filename="img/profile_pics/default.jpg") }}'
+            },
+            {
+                username: 'Sarah Williams',
+                time: 'Yesterday',
+                image: 'https://source.unsplash.com/random/300x600/?city',
+                avatar: '{{ url_for("static", filename="img/profile_pics/default.jpg") }}'
+            },
+            {
+                username: 'David Brown',
+                time: '2 days ago',
+                image: 'https://source.unsplash.com/random/300x600/?food',
+                avatar: '{{ url_for("static", filename="img/profile_pics/default.jpg") }}'
+            }
+        ];
+        
+        let currentStoryIndex = 0;
+        let storyTimeout;
+        
+        // Open story viewer when clicking on a story
+        const storyElements = document.querySelectorAll('[style*="aspect-ratio: 9/16"]');
+        storyElements.forEach((element, index) => {
+            if (index > 0) { // Skip the "Create Story" element
+                element.addEventListener('click', function() {
+                    currentStoryIndex = index - 1; // Adjust for the "Create Story" element
+                    openStoryViewer();
+                });
+            }
+        });
+        
+        // Close story viewer
+        closeStory.addEventListener('click', function() {
+            storyViewer.style.display = 'none';
+            clearTimeout(storyTimeout);
+        });
+        
+        // Navigate to previous story
+        prevStory.addEventListener('click', function() {
+            if (currentStoryIndex > 0) {
+                currentStoryIndex--;
+                showCurrentStory();
+            }
+        });
+        
+        // Navigate to next story
+        nextStory.addEventListener('click', function() {
+            if (currentStoryIndex < stories.length - 1) {
+                currentStoryIndex++;
+                showCurrentStory();
+            } else {
+                storyViewer.style.display = 'none';
+                clearTimeout(storyTimeout);
+            }
+        });
+        
+        // Open story viewer and show current story
+        function openStoryViewer() {
+            storyViewer.style.display = 'block';
+            showCurrentStory();
+        }
+        
+        // Show current story
+        function showCurrentStory() {
+            clearTimeout(storyTimeout);
+            
+            const story = stories[currentStoryIndex];
+            storyImage.src = story.image;
+            storyUsername.textContent = story.username;
+            storyTime.textContent = story.time;
+            storyAvatar.src = story.avatar;
+            
+            // Reset progress bar
+            storyProgress.style.width = '0';
+            
+            // Animate progress bar
+            let progress = 0;
+            const interval = 50; // Update every 50ms
+            const duration = 5000; // 5 seconds per story
+            const increment = (interval / duration) * 100;
+            
+            function updateProgress() {
+                progress += increment;
+                storyProgress.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    // Move to next story or close viewer if last story
+                    if (currentStoryIndex < stories.length - 1) {
+                        currentStoryIndex++;
+                        showCurrentStory();
+                    } else {
+                        storyViewer.style.display = 'none';
+                    }
+                } else {
+                    storyTimeout = setTimeout(updateProgress, interval);
+                }
+            }
+            
+            storyTimeout = setTimeout(updateProgress, interval);
+        }
+        
+        // Check if data saver is enabled
+        const dataSaver = localStorage.getItem('dataSaver') === 'true';
+        
+        if (dataSaver) {
+            // If data saver is enabled, load lower quality images
+            const images = document.querySelectorAll('img[src*="unsplash"]');
+            images.forEach(img => {
+                const src = img.src;
+                if (src.includes('300x600')) {
+                    // Modify the URL to request a smaller image
+                    img.src = src.replace('300x600', '150x300');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

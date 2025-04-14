@@ -1,0 +1,171 @@
+/* Styles for WebSocket features */
+
+/* Connection Status */
+.connection-status {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.connection-status.connected {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.connection-status.disconnected {
+    background-color: #F44336;
+    color: white;
+}
+
+.connection-status.fade-out {
+    opacity: 0;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    padding: 8px 15px;
+    margin: 10px 0;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+    background-color: #f1f1f1;
+    max-width: 150px;
+}
+
+.typing-dots {
+    display: inline-flex;
+    margin-right: 5px;
+}
+
+.typing-dots span {
+    height: 8px;
+    width: 8px;
+    margin: 0 1px;
+    background-color: #999;
+    border-radius: 50%;
+    display: inline-block;
+    animation: typing-dot 1.4s infinite ease-in-out both;
+}
+
+.typing-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing-dot {
+    0%, 80%, 100% { 
+        transform: scale(0.7);
+        opacity: 0.5;
+    }
+    40% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* System Messages */
+.system-message {
+    text-align: center;
+    padding: 5px 10px;
+    margin: 10px auto;
+    font-size: 12px;
+    color: #666;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    max-width: 80%;
+}
+
+/* User Status Indicators */
+.user-status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.user-status-indicator.online-status {
+    background-color: #4CAF50;
+    box-shadow: 0 0 5px #4CAF50;
+}
+
+.user-status-indicator.offline-status {
+    background-color: #ccc;
+}
+
+/* Socket Connection Status Classes */
+body.socket-connected .offline-indicator {
+    display: none;
+}
+
+body.socket-disconnected .offline-indicator {
+    display: block;
+    background-color: #ffcc00;
+    color: #333;
+    text-align: center;
+    padding: 5px;
+    font-size: 14px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+/* Message Status Indicators */
+.message-status.read-status {
+    color: #0084ff;
+}
+
+.message-status.delivered-status {
+    color: #65676b;
+}
+
+.message-status.sent-status {
+    color: #65676b;
+    opacity: 0.7;
+}
+
+/* Dark Theme Adjustments */
+.dark-theme .typing-indicator {
+    background-color: #2a2a2a;
+    color: #ddd;
+}
+
+.dark-theme .system-message {
+    background-color: #2a2a2a;
+    color: #bbb;
+}
+
+.dark-theme .connection-status.connected {
+    background-color: #2e7d32;
+}
+
+.dark-theme .connection-status.disconnected {
+    background-color: #c62828;
+}
+
+.dark-theme .typing-dots span {
+    background-color: #bbb;
+}
+
+.dark-theme .offline-indicator {
+    background-color: #5c4a00;
+    color: #fff;
+}

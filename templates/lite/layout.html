@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ config.site.name }}{% endblock %}</title>
+    <meta name="description" content="{{ config.site.description }}">
+    <meta name="theme-color" content="{{ config.site.themeColor }}">
+    <link rel="icon" href="{{ config.site.logo.favicon }}">
+    <link rel="apple-touch-icon" href="{{ config.site.logo.touchIcon }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lite-ui.css') }}">
+    {% block styles %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/config-loader.js') }}"></script>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="navbar-top">
+        <a href="{{ url_for('main.index') }}" class="navbar-logo">{{ config.site.name }}</a>
+        <div class="navbar-actions">
+            <button class="navbar-action" aria-label="Search">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="navbar-action" aria-label="Notifications" id="notifications-btn">
+                <i class="fas fa-bell"></i>
+                <span class="badge">3</span>
+            </button>
+            <a href="{{ url_for('messages.inbox') }}" class="navbar-action" aria-label="Messages">
+                <i class="fas fa-comment"></i>
+                <span class="badge">2</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bottom Navigation Bar (Mobile) -->
+    <nav class="navbar-bottom">
+        <a href="{{ url_for('main.index') }}" class="navbar-tab {% if request.endpoint == 'main.index' %}active{% endif %}" aria-label="Home">
+            <i class="fas fa-home navbar-tab-icon"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ url_for('users.friends') }}" class="navbar-tab {% if request.endpoint == 'users.friends' %}active{% endif %}" aria-label="Friends">
+            <i class="fas fa-user-friends navbar-tab-icon"></i>
+            <span>Friends</span>
+        </a>
+        <a href="{{ url_for('posts.stories') }}" class="navbar-tab {% if request.endpoint == 'posts.stories' %}active{% endif %}" aria-label="Stories">
+            <i class="fas fa-book navbar-tab-icon"></i>
+            <span>Stories</span>
+        </a>
+        <button class="navbar-tab" id="notifications-tab-btn" aria-label="Notifications">
+            <i class="fas fa-bell navbar-tab-icon"></i>
+            <span>Alerts</span>
+        </button>
+        <button class="navbar-tab" id="menu-btn" aria-label="Menu">
+            <i class="fas fa-bars navbar-tab-icon"></i>
+            <span>Menu</span>
+        </button>
+    </nav>
+
+    <!-- Notifications Panel (Hidden by default) -->
+    <div id="notifications-panel" class="notifications-container" style="display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0; z-index: 999; background-color: var(--bg-primary); overflow-y: auto;">
+        <div class="flex justify-between align-center" style="padding: var(--spacing-md);">
+            <h2>Notifications</h2>
+            <button id="close-notifications" aria-label="Close notifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="notification-item">
+            <div class="notification-avatar">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            </div>
+            <div class="notification-content">
+                <div class="notification-text"><strong>John Doe</strong> liked your post.</div>
+                <div class="notification-time">2 hours ago</div>
+            </div>
+        </div>
+
+        <div class="notification-item">
+            <div class="notification-avatar">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            </div>
+            <div class="notification-content">
+                <div class="notification-text"><strong>Jane Smith</strong> commented on your photo.</div>
+                <div class="notification-time">Yesterday</div>
+            </div>
+        </div>
+
+        <div class="notification-item">
+            <div class="notification-avatar">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="User avatar">
+            </div>
+            <div class="notification-content">
+                <div class="notification-text"><strong>Mike Johnson</strong> sent you a friend request.</div>
+                <div class="notification-time">2 days ago</div>
+                <div class="notification-actions">
+                    <button class="notification-btn primary">Accept</button>
+                    <button class="notification-btn secondary">Decline</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Panel (Hidden by default) -->
+    <div id="menu-panel" class="menu-container" style="display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0; z-index: 999; background-color: var(--bg-primary); overflow-y: auto;">
+        <div class="flex justify-between align-center" style="padding: var(--spacing-md);">
+            <h2>Menu</h2>
+            <button id="close-menu" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="menu-header">
+            <div class="menu-avatar">
+                <img src="{{ url_for('static', filename='img/profile_pics/default.jpg') }}" alt="Your profile picture">
+            </div>
+            <div class="menu-user-info">
+                <div class="menu-username">{{ current_user.username }}</div>
+                <div class="menu-email">{{ current_user.email }}</div>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Preferences</div>
+
+            <div class="menu-item">
+                <div class="menu-item-icon">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="menu-item-text">Dark Mode</div>
+                <div class="menu-item-action">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="menu-item-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="menu-item-text">Data Saver</div>
+                <div class="menu-item-action">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="data-saver-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Account</div>
+
+            <a href="{{ url_for('users.profile', username=current_user.username) }}" class="menu-item">
+                <div class="menu-item-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="menu-item-text">Your Profile</div>
+                <div class="menu-item-action">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+
+            <a href="{{ url_for('users.settings') }}" class="menu-item">
+                <div class="menu-item-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="menu-item-text">Settings</div>
+                <div class="menu-item-action">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+
+            <a href="{{ url_for('users.help') }}" class="menu-item">
+                <div class="menu-item-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <div class="menu-item-text">Help & Support</div>
+                <div class="menu-item-action">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}" class="menu-item">
+                <div class="menu-item-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="menu-item-text">Logout</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Offline Indicator (Hidden by default) -->
+    <div id="offline-indicator" class="offline-indicator" style="display: none;">
+        You are currently offline. Some features may be unavailable.
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/lite-app.js') }}"></script>
+    <script>
+        // Initialize app with configuration
+        document.addEventListener('config-loaded', function(event) {
+            const config = event.detail;
+            console.log('Configuration loaded:', config.site.name);
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            // Check if user has a theme preference stored
+            const savedTheme = localStorage.getItem('theme') || config.app.defaultTheme;
+            if (savedTheme === 'light') {
+                body.classList.add('light-mode');
+                if (themeToggle) themeToggle.checked = false;
+            }
+
+            if (themeToggle) {
+                themeToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        body.classList.remove('light-mode');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        body.classList.add('light-mode');
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
+
+        // Notifications panel toggle
+        const notificationsBtn = document.getElementById('notifications-btn');
+        const notificationsTabBtn = document.getElementById('notifications-tab-btn');
+        const notificationsPanel = document.getElementById('notifications-panel');
+        const closeNotifications = document.getElementById('close-notifications');
+
+        function toggleNotifications() {
+            notificationsPanel.style.display = notificationsPanel.style.display === 'none' ? 'block' : 'none';
+            menuPanel.style.display = 'none'; // Close menu if open
+        }
+
+        notificationsBtn.addEventListener('click', toggleNotifications);
+        notificationsTabBtn.addEventListener('click', toggleNotifications);
+        closeNotifications.addEventListener('click', function() {
+            notificationsPanel.style.display = 'none';
+        });
+
+        // Menu panel toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const menuPanel = document.getElementById('menu-panel');
+        const closeMenu = document.getElementById('close-menu');
+
+        menuBtn.addEventListener('click', function() {
+            menuPanel.style.display = menuPanel.style.display === 'none' ? 'block' : 'none';
+            notificationsPanel.style.display = 'none'; // Close notifications if open
+        });
+
+        closeMenu.addEventListener('click', function() {
+            menuPanel.style.display = 'none';
+        });
+
+        // Data saver toggle
+        const dataSaverToggle = document.getElementById('data-saver-toggle');
+
+        // Check if user has data saver preference stored
+        const savedDataSaver = localStorage.getItem('dataSaver');
+        if (savedDataSaver === 'true') {
+            dataSaverToggle.checked = true;
+            // Apply data saver mode (e.g., load lower quality images)
+            document.body.classList.add('data-saver');
+        }
+
+        dataSaverToggle.addEventListener('change', function() {
+            if (this.checked) {
+                localStorage.setItem('dataSaver', 'true');
+                document.body.classList.add('data-saver');
+            } else {
+                localStorage.setItem('dataSaver', 'false');
+                document.body.classList.remove('data-saver');
+            }
+        });
+
+        // Offline detection
+        const offlineIndicator = document.getElementById('offline-indicator');
+
+        window.addEventListener('online', function() {
+            offlineIndicator.style.display = 'none';
+        });
+
+        window.addEventListener('offline', function() {
+            offlineIndicator.style.display = 'block';
+        });
+
+        // Check initial connection status
+        if (!navigator.onLine) {
+            offlineIndicator.style.display = 'block';
+        }
+
+        // Apply other configuration settings
+        if (config.app.dataSaver && config.app.dataSaver.enabled) {
+            const dataSaverToggle = document.getElementById('data-saver-toggle');
+            if (dataSaverToggle) dataSaverToggle.checked = true;
+        }
+    });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

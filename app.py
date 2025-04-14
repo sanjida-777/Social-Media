@@ -1,4 +1,6 @@
 import os
+import eventlet
+eventlet.monkey_patch()
 from datetime import datetime, timezone
 from flask import Flask, redirect, url_for
 from flask_login import LoginManager
@@ -6,6 +8,8 @@ from flask_bcrypt import Bcrypt
 from models import db
 from models.user import User
 from config import config
+import sub.socket_events as socket_events
+import sub.app_config as app_config
 
 # Import routes
 from routes.auth_routes import auth
@@ -13,6 +17,7 @@ from routes.feed_routes import feed
 from routes.profile_routes import profile
 from routes.message_routes import messages
 from routes.friendship_routes import friendship
+from routes.api_routes import api
 
 def create_app(config_name='default'):
     """Create and configure the Flask application."""
@@ -30,6 +35,9 @@ def create_app(config_name='default'):
     login_manager.login_view = 'auth.login'
     login_manager.login_message_category = 'info'
 
+    # Initialize SocketIO
+    socketio = socket_events.init_app(app)
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
@@ -40,6 +48,7 @@ def create_app(config_name='default'):
     app.register_blueprint(profile, url_prefix='/profile')
     app.register_blueprint(messages, url_prefix='/messages')
     app.register_blueprint(friendship, url_prefix='/friendship')
+    app.register_blueprint(api)
 
     # Root route redirects to feed
     @app.route('/')
@@ -55,8 +64,13 @@ def create_app(config_name='default'):
     def inject_now():
         return {'now': datetime.now(timezone.utc)}
 
+    # Initialize application with JSON configuration
+    app_config.init_app(app)
+
     return app
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    # Use SocketIO's run method instead of app.run
+    socketio = socket_events.socketio
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
